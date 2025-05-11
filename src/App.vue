@@ -1,9 +1,9 @@
 <template>
-    <div>
-        <Room></Room>
+    <div class="main-layout">
+        <RouterView />
     </div>
 </template>
 <style scoped src="./App.scss"></style>
 <script setup>
-import Room from './views/home/index.vue';
+
 </script>
