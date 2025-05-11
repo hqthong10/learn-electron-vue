@@ -1,3 +1,4 @@
 .DS_Store
 .vite/build/*
 node_modules/
+components.d.ts
