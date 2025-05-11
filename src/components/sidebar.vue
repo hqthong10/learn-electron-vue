@@ -1,6 +1,11 @@
 <template>
-    <div class="side-bar">
-        <div class="side-bar">item</div>
+    <div class="sidebar-main">
+        <div class="bar-item">
+            <RouterLink to="/#">Home</RouterLink>
+        </div>
+        <div class="bar-item">
+            <RouterLink to="/#profile">Profile</RouterLink>
+        </div>
     </div>
 </template>
 <script setup lang="ts">

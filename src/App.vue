@@ -1,5 +1,6 @@
 <template>
     <div class="main-layout">
+        <Sidebar />
         <RouterView />
     </div>
 </template>
