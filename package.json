@@ -48,6 +48,7 @@
     "electron-squirrel-startup": "^1.0.1",
     "electron-window-state": "^5.0.3",
     "element-plus": "^2.9.7",
+    "serialport": "^13.0.0",
     "vue-router": "^4.5.1"
   }
 }
