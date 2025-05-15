@@ -1,10 +1,10 @@
 <template>
     <div class="sidebar-main">
         <div class="bar-item">
-            <RouterLink to="/#">Home</RouterLink>
+            <RouterLink to="/">Home</RouterLink>
         </div>
         <div class="bar-item">
-            <RouterLink to="/#profile">Profile</RouterLink>
+            <RouterLink to="/profile">Profile</RouterLink>
         </div>
     </div>
 </template>

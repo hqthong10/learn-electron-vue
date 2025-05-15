@@ -2,14 +2,16 @@ import { app, BrowserWindow, desktopCapturer, ipcMain } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import windowStateKeeper from 'electron-window-state';
-import { spawn } from 'node:child_process';
 import * as fs from 'fs';
+import Store from 'electron-store';
 
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
+
+const store = new Store() as any;
 
 const createWindow = () => {
   const mainWindowState = windowStateKeeper({
@@ -69,15 +71,58 @@ app.on('activate', () => {
   }
 });
 
-function getSavePath(fileName: string) {
-  const platformSaveDir = app.getPath('videos'); // có thể là 'documents', 'desktop', etc.
-  const savePath = path.join(platformSaveDir, 'MyApp', fileName); // tạo thư mục con trong Videos
+ipcMain.handle('getInfoUser', async (event) => {
+  const user = store.get('myapp-user');  
+  return user;
+});
 
-  // Đảm bảo thư mục tồn tại
-  const saveDir = path.dirname(savePath);
-  if (!fs.existsSync(saveDir)) {
-    fs.mkdirSync(saveDir, { recursive: true });
+//
+ipcMain.handle('setInfoUser', async (event, data) => {
+  store.set('myapp-user', data);
+});
+
+//
+ipcMain.handle('getToken', async (event) => {
+  const token = store.get('myapp-token');  
+  return token;
+});
+
+//
+ipcMain.handle('setToken', async (event, token) => {
+  store.set('myapp-token', token);
+});
+
+const API_BASE = '';
+function getAuthHeader() {
+  const token = store.get('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+ipcMain.handle('postApi', async (_, options) => {
+  const res = await fetch(`${API_BASE}/${options.path}`, {
+    method: 'post',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(options.params)
+  });
+
+  const data = await res.json();
+  if (res.ok && data.token) {
+    store.set('token', data.token);
   }
 
-  return savePath;
-}
+  return { ok: res.ok, data };
+});
+
+ipcMain.handle('getApi', async (_, options) => {
+  const res = await fetch(`${API_BASE}/${options.path}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeader()
+    },
+  });
+
+  return {
+    ok: res.ok,
+    data: await res.json()
+  };
+});

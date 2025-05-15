@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1",
+    "electron-store": "^8.2.0",
     "electron-window-state": "^5.0.3",
     "element-plus": "^2.9.7",
     "serialport": "^13.0.0",

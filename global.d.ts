@@ -2,12 +2,12 @@ export {}
 declare global {
     interface Window {
         Api: {
-            getSources: (params: any) => any,
-            pushRtmp: any,
-            saveVideo: any,
-            startFFmpeg: any,
-            sendMediaToFFmpeg: any,
-            endFFmpeg: any,
+            getInfoUser: (params: any) => any,
+            setInfoUser: (params: any) => any,
+            getToken: (params: any) => any,
+            setToken: (params: any) => any,
+            postApi: (params: any) => any,
+            getApi: (params: any) => any,
         }
     }
 }
