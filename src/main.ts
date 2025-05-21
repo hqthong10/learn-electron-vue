@@ -140,7 +140,6 @@ app.on('activate', () => {
   }
 });
 
-
 const STORE_USER_KEY = 'wbnl-user';
 const STORE_TOKEN_KEY = 'wbnl-token';
 const domainWebServiceViewer = "https://000.webinaris.co/apiv4/app/proxy/";
