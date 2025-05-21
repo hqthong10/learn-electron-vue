@@ -1,0 +1,16 @@
+@import '@/assets/fonts/roboto/stylesheet.css';
+@import '@/assets/fonts/open-sans/stylesheet.css';
+@import './theme.scss';
+@import './element.scss';
+
+body {
+  font-family: Roboto, OpenSans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0px;
+  background-color: #f0f0f0;
+}
+
+*{
+  box-sizing: border-box;
+}
