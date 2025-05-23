@@ -23,6 +23,8 @@ import { ref, reactive, onMounted, watch } from 'vue';
 
 let devices = reactive<any[]>([]);
 const deviceActive = ref('Chọn thiết bị');
+let buffer = ''
+let lastKeyTime = Date.now()
 
 onMounted(async () => {
     const dv = await window.Api.getDevices();
@@ -58,6 +60,27 @@ onMounted(async () => {
             buffer += e.key
         }
     })
+
+    window.addEventListener('keydown', (e) => {
+        const currentTime = Date.now()
+
+        // Nếu thời gian giữa 2 phím > 100ms, reset buffer (do người gõ tay)
+        if (currentTime - lastKeyTime > 100) {
+            buffer = ''
+        }
+
+        if (e.key === 'Enter') {
+            // scanner thường kết thúc bằng Enter
+            if (buffer.length > 4) {
+            console.log('📥 Mã từ thiết bị:', buffer)
+            }
+            buffer = ''
+        } else {
+            buffer += e.key
+        }
+
+        lastKeyTime = currentTime
+        })
 
 });
 
