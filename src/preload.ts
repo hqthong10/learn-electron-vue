@@ -31,7 +31,7 @@ contextBridge.exposeInMainWorld("Api", {
 
     connectCOM: (path: string) => ipcRenderer.invoke("connect-com", path),
 
-    connectHID: (device: any) => ipcRenderer.invoke("connect-hid", device),
+    connectHID: (data: any) => ipcRenderer.invoke("connect-hid", data),
     
     onCOM: (callback: (data: string) => void) => {
         ipcRenderer.on('com-data', (_e, data) => callback(data))

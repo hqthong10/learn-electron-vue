@@ -1,6 +1,6 @@
 <template>
     <div class="main-layout">
-        <SideBar></SideBar>
+        <!-- <SideBar></SideBar> -->
         <RouterView class="main-body"></RouterView>
     </div>
 </template>
@@ -9,7 +9,7 @@
 import { onMounted, onBeforeMount } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
-import SideBar from '@/components/SideBar.vue';
+// import SideBar from '@/components/SideBar.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();

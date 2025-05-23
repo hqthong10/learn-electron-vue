@@ -253,11 +253,11 @@ ipcMain.handle('connect-com', async (_, path: string) => {
 
 ipcMain.handle('connect-hid', async (_, device: any) => {
     try {
-        // const deviceHid = new HID.HID(device.vendorId, device.productId);
-        const deviceHid = new HID.HID(device.path);
+        const deviceHid = new HID.HID(device.vendorId, device.productId);
+        // const deviceHid = new HID.HID(device.path);
 
-        //var device = await HID.HIDAsync.open(path);
-        // var device = await HID.HIDAsync.open(vid,pid);
+        //var deviceHid = await HID.HIDAsync.open(path);
+        // var deviceHid = await HID.HIDAsync.open(vid,pid);
     
         deviceHid.on('data', (data) => {
             console.log('📥 Received from HID device:', data)
@@ -266,7 +266,8 @@ ipcMain.handle('connect-hid', async (_, device: any) => {
 
         deviceHid.on('error', (err) => {
             console.error('HID Error:', err)
-        })    
+        })
+        return true;
     } catch (err) {
         console.error('Error connecting to HID device:', err)
     }

@@ -27,9 +27,8 @@ const deviceActive = ref('Chọn thiết bị');
 onMounted(async () => {
     const dv = await window.Api.getDevices();
     const hids = dedupeById(dv.hid || []);
-    const coms = dedupeById(dv.com || []);
+    // const coms = dedupeById(dv.com || []);
     hids.forEach((hid: any) => {
-        console.log(hid);
         devices.push(hid);
     });
 
@@ -48,6 +47,18 @@ onMounted(async () => {
     window.Api.onHID((data) => {
         console.log('HID nhận được:', data)
     });
+
+    let buffer = ''
+    window.addEventListener('keydown', (e) => {
+        console.log('keydown:', e)
+        if (e.key === 'Enter') {
+            console.log('Thẻ:', buffer)
+            buffer = ''
+        } else {
+            buffer += e.key
+        }
+    })
+
 });
 
 function dedupeById(arr: any[]) {
@@ -65,9 +76,9 @@ const getName = (txt: string) => {
 }
 
 const choiceSerialport = (obj: any) => {
-    // window.Api.connectCOM(obj.path);
     deviceActive.value = obj.product;
-    window.Api.connectHID(obj);
+    // window.Api.connectCOM(obj.path);
+    window.Api.connectHID({...obj});
 }
 
 </script>
