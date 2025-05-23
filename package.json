@@ -22,11 +22,12 @@
     "@electron-forge/maker-rpm": "^7.7.0",
     "@electron-forge/maker-squirrel": "^7.7.0",
     "@electron-forge/maker-zip": "^7.7.0",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.7.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.8.1",
     "@electron-forge/plugin-fuses": "^7.7.0",
     "@electron-forge/plugin-vite": "^7.7.0",
     "@electron/fuses": "^1.8.0",
     "@electron/rebuild": "^4.0.1",
+    "@types/crypto-js": "^4.2.2",
     "@types/electron-squirrel-startup": "^1.0.2",
     "@types/fluent-ffmpeg": "^2.1.27",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
@@ -43,18 +44,19 @@
     "unplugin-vue-components": "^28.4.1",
     "vite": "^5.4.14",
     "vite-plugin-sass": "^0.1.0",
+    "vite-svg-loader": "^5.1.0",
     "vue": "^3.5.13"
   },
   "dependencies": {
-    "@serialport/parser-byte-length": "^13.0.0",
     "axios": "^1.9.0",
+    "crypto-js": "^4.2.0",
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^10.0.1",
     "electron-window-state": "^5.0.3",
     "element-plus": "^2.9.7",
+    "node-hid": "^3.1.2",
     "pinia": "^3.0.2",
-    "serialport": "^12.0.0",
-    "vite-svg-loader": "^5.1.0",
+    "serialport": "^13.0.0",
     "vue-router": "^4.5.1"
   }
 }

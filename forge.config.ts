@@ -9,7 +9,9 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
 const config: ForgeConfig = {
   packagerConfig: {
+    name: 'My Electron App',
     asar: true,
+    icon: './public/logo.png'
   },
   rebuildConfig: {},
   makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
@@ -48,6 +50,11 @@ const config: ForgeConfig = {
       [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
     }),
+
+    {
+      name: '@electron-forge/plugin-auto-unpack-natives',
+      config: {}
+    },
   ],
 };
 

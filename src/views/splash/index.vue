@@ -1,10 +1,7 @@
 <template>
     <div class="splash-page">
       <div class="div-logo">
-          <img src="../../assets/images/webinaris-logo.png" />
-      </div>
-      <div class="div-logo-text">
-          <img src="../../assets/images/logo-text.png" />
+          <img src="../../assets/images/logo.png" />
       </div>
     </div>
 </template>

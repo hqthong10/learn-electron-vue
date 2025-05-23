@@ -6,5 +6,10 @@ export default defineConfig({
         preprocessorOptions: {
             scss: { api: 'modern-compiler' }
         }
+    },
+    build: {
+        rollupOptions: {
+            external: ['serialport', 'node-hid']
+        }
     }
 });
