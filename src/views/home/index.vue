@@ -2,17 +2,17 @@
     <div class="home-view">
         <div class="div-sidebar">
             <el-dropdown placement="top-start">
-                <el-button>{{ (serialport) }}</el-button>
+                <el-button>{{ deviceActive }}</el-button>
                 <template #dropdown>
                     <el-dropdown-menu>
-                        <el-dropdown-item v-for="(item,index) in devices" :key="index" @click="choiceSerialport(item)">{{ getName(item.path || '') }}</el-dropdown-item>
+                        <el-dropdown-item v-for="(item, index) in devices" :key="index"
+                            @click="choiceSerialport(item)">{{ (item.product || '') }}</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
             </el-dropdown>
         </div>
         <div class="div-main">
             home
-
         </div>
 
     </div>
@@ -20,50 +20,54 @@
 <style scoped src="./index.scss"></style>
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue';
-import HID from 'node-hid'
 
 let devices = reactive<any[]>([]);
-const serialport = ref('Chọn thiết bị');
+const deviceActive = ref('Chọn thiết bị');
 
 onMounted(async () => {
-    const dt = await window.Api.getListSerialport();
-    devices.push(...dt.serialport);
-    devices.push(...dt.hid);
-    console.log(devices);
+    const dv = await window.Api.getDevices();
+    const hids = dedupeById(dv.hid || []);
+    const coms = dedupeById(dv.com || []);
+    hids.forEach((hid: any) => {
+        console.log(hid);
+        devices.push(hid);
+    });
 
-    window.Api.onRFID((tag) => {
-        console.log('🪪 Thẻ RFID nhận được:', tag)
-    })
+    // devices.push(...hids);
+    // devices.push(hids[0]);
+    // devices.push(hids[2]);
+    // devices.push(hids[3]);
+    // devices.push(hids[4]);
+    // devices.push(hids[5]);
 
-    // const _devices = HID.devices();
-    // console.log('_devices', _devices);
 
-    // const readerInfo = _devices.find(device => 
-    //     device.vendorId === 0x1234 && device.productId === 0x5678 // Thay bằng ID thực của đầu đọc
-    // );
+    window.Api.onCOM((tag) => {
+        console.log('COM nhận được:', tag)
+    });
 
-    // if (readerInfo) {
-    //     const reader = new HID.HID(readerInfo.path)
-        
-    //     reader.on('data', (data) => {
-    //         // const cardData = parseCardData(data) // Hàm phân tích dữ liệu thẻ
-    //         console.log('Dữ liệu thẻ:', data)
-    //     })
-        
-    //     reader.on('error', (err) => {
-    //         console.error('Lỗi đầu đọc HID:', err)
-    //     })
-    // } else {
-    //     console.error('Không tìm thấy đầu đọc thẻ')
-    // }
+    window.Api.onHID((data) => {
+        console.log('HID nhận được:', data)
+    });
 });
 
-const getName =(txt: string) => {
+function dedupeById(arr: any[]) {
+    const seen = new Set();
+    return arr.filter(item => {
+        const key = `${item.vendorId}-${item.productId}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+
+const getName = (txt: string) => {
     return txt.split('/').pop();
 }
 
 const choiceSerialport = (obj: any) => {
-    window.Api.useSerialport(obj.path);
+    // window.Api.connectCOM(obj.path);
+    deviceActive.value = obj.product;
+    window.Api.connectHID(obj);
 }
 
 </script>

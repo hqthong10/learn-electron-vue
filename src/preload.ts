@@ -27,11 +27,17 @@ contextBridge.exposeInMainWorld("Api", {
     
     getVersion: () => version,
 
-    getListSerialport: () => ipcRenderer.invoke("get-list-serialport"),
+    getDevices: () => ipcRenderer.invoke("get-devices"),
 
-    useSerialport: (path: string) => ipcRenderer.invoke("use-serialport", path),
+    connectCOM: (path: string) => ipcRenderer.invoke("connect-com", path),
 
-    onRFID: (callback: (data: string) => void) => {
-        ipcRenderer.on('rfid-data', (_e, data) => callback(data))
+    connectHID: (device: any) => ipcRenderer.invoke("connect-hid", device),
+    
+    onCOM: (callback: (data: string) => void) => {
+        ipcRenderer.on('com-data', (_e, data) => callback(data))
+    },
+
+    onHID: (callback: (data: any) => void) => {
+        ipcRenderer.on('hid-data', (_e, data) => callback(data))
     }
 });

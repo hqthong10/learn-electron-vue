@@ -217,28 +217,23 @@ async function callRequest(method: string, url: string, data: any, option?: any)
     }
 }
 
-ipcMain.handle('get-list-serialport', async () => {
+ipcMain.handle('get-devices', async () => {
     try {
-        const hid = HID.devices();
-        const serialport = await SerialPort.list();
-        return { hid, serialport };
+        // const hid = HID.devices();
+        const hid = await HID.devicesAsync();
+        const com = await SerialPort.list();
+        return { hid, com };
     } catch(e){
-        //
+        console.log(e);
+        return { hid: [], com: [] };
     }
 });
 
-ipcMain.handle('use-serialport', async (_, path: string) => {
+ipcMain.handle('connect-com', async (_, path: string) => {
     const serialPort = new SerialPort({
         path: path, //'/dev/tty.usbserial-1410', // hoặc COM3
         baudRate: 9600
     });
-    // const port = new SerialPort({ path: '/dev/port', baudRate: 9600 });
-    // const port = new SerialPort({
-    //   // path: 'COM3', // hoặc '/dev/ttyUSB0' nếu dùng Linux
-    //   // baudRate: 9600
-    //    path: '/dev/tty-usbserial1',
-    // baudRate: 57600,
-    // })
 
     serialPort.on('open', () => {
         console.log(`Đã kết nối tới ${path}`)
@@ -250,8 +245,30 @@ ipcMain.handle('use-serialport', async (_, path: string) => {
 
     serialPort.on('data', (data: any) => {
         const tag = data.toString().trim();
-        console.log('RFID Tag:', tag);
+        console.log('COM Tag:', tag);
         // Gửi tag về renderer nếu cần
-        mainWindow?.webContents.send('rfid-tag', tag);
+        mainWindow?.webContents.send('com-tag', tag);
     });
+});
+
+ipcMain.handle('connect-hid', async (_, device: any) => {
+    try {
+        // const deviceHid = new HID.HID(device.vendorId, device.productId);
+        const deviceHid = new HID.HID(device.path);
+
+        //var device = await HID.HIDAsync.open(path);
+        // var device = await HID.HIDAsync.open(vid,pid);
+    
+        deviceHid.on('data', (data) => {
+            console.log('📥 Received from HID device:', data)
+            mainWindow?.webContents.send('hid-data', data);
+        })
+
+        deviceHid.on('error', (err) => {
+            console.error('HID Error:', err)
+        })    
+    } catch (err) {
+        console.error('Error connecting to HID device:', err)
+    }
+    
 });

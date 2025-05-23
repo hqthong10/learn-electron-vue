@@ -11,9 +11,11 @@ declare global {
             getApi: (path: string, data: any, options?: any) => any,
             postApi: (path: string, data: any, options?: any) => any,
             getVersion: () => string,
-            getListSerialport: () => any,
-            useSerialport: (path: string) => any,
-            onRFID: (cb: (data: string) => void) => void
+            getDevices: () => any,
+            connectCOM: (path: string) => any,
+            connectHID: (device: any) => any,
+            onCOM: (cb: (data: string) => void) => void,
+            onHID: (cb: (data: string) => void) => void,
         }
     }
 }
