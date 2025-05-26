@@ -4,7 +4,7 @@
             <h1 class="login-title">Đăng Nhập</h1>
             <el-form :model="form" label-width="auto" label-position="top" class="login-form">
                 <el-form-item label="Số điện thoại">
-                    <el-input v-model="form.email" />
+                    <el-input v-model="form.phone" />
                 </el-form-item>
                 <el-form-item label="Mật khẩu">
                     <el-input v-model="form.password" type="password" />
@@ -24,20 +24,24 @@ import { reactive } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { login } from '@/api/auth';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
 
 const authStore = useAuthStore();
 const router = useRouter();
 
 const form = reactive({
-    email: '',
+    phone: '',
     password: ''
 });
 
 const actionLoginProvider = async () => {
-    const rs = await login(form.email, form.password);
-    if (rs.status === 'success' && rs.elements) {
-        authStore.loginSuccess(rs.elements?.TOKEN || '', rs.elements);
-        router.push('/showtime');
+    const rs = await login(form.phone, form.password);
+    if (rs) {
+        ElMessage.success('Thành công.');
+        authStore.loginSuccess(rs);
+        router.push('/home');
+    } else {
+        ElMessage.error('Đăng nhập không thành công!');
     }
 };
 

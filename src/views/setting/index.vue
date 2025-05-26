@@ -1,6 +1,6 @@
 <template>
-    <div class="profile-view">
-        Profile
+    <div class="setting-view">
+        Setting
     </div>
 </template>
 <style scoped src="./index.scss"></style>

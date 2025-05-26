@@ -34,14 +34,6 @@ onMounted(async () => {
         devices.push(hid);
     });
 
-    // devices.push(...hids);
-    // devices.push(hids[0]);
-    // devices.push(hids[2]);
-    // devices.push(hids[3]);
-    // devices.push(hids[4]);
-    // devices.push(hids[5]);
-
-
     window.Api.onCOM((tag) => {
         console.log('COM nhận được:', tag)
     });
@@ -51,15 +43,6 @@ onMounted(async () => {
     });
 
     let buffer = ''
-    window.addEventListener('keydown', (e) => {
-        console.log('keydown:', e)
-        if (e.key === 'Enter') {
-            console.log('Thẻ:', buffer)
-            buffer = ''
-        } else {
-            buffer += e.key
-        }
-    })
 
     window.addEventListener('keydown', (e) => {
         const currentTime = Date.now()
@@ -72,7 +55,7 @@ onMounted(async () => {
         if (e.key === 'Enter') {
             // scanner thường kết thúc bằng Enter
             if (buffer.length > 4) {
-            console.log('📥 Mã từ thiết bị:', buffer)
+                console.log('Mã từ thiết bị:', buffer)
             }
             buffer = ''
         } else {
@@ -80,7 +63,7 @@ onMounted(async () => {
         }
 
         lastKeyTime = currentTime
-        })
+    })
 
 });
 
@@ -101,7 +84,7 @@ const getName = (txt: string) => {
 const choiceSerialport = (obj: any) => {
     deviceActive.value = obj.product;
     // window.Api.connectCOM(obj.path);
-    window.Api.connectHID({...obj});
+    window.Api.connectHID({ ...obj });
 }
 
 </script>

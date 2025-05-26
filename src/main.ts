@@ -3,7 +3,7 @@ import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import windowStateKeeper from 'electron-window-state';
 import axios from 'axios';
-import store from './electron/app-store.ts';
+import store from './electron/app-store';
 import { SerialPort } from 'serialport';
 import HID from 'node-hid'
 import os from 'os'
@@ -131,77 +131,65 @@ app.on('activate', () => {
     }
 });
 
-const STORE_USER_KEY = 'wbnl-user';
-const STORE_TOKEN_KEY = 'wbnl-token';
-const domainWebServiceViewer = 'https://000.webinaris.co/apiv4/app/proxy/';
-const domainWebServiceAdmin = 'https://app.webinaris.co/api/app/';
+const STORE_USER_KEY = 'nmh-user';
+const API_URL = 'https://api.vhomesolution.com/';
 
-ipcMain.handle('getInfoUser', async () => {
+ipcMain.handle('get-info-user', async () => {
     const user = store.get(STORE_USER_KEY);
     return user;
 });
 
 //
-ipcMain.handle('setInfoUser', async (_, data) => {
+ipcMain.handle('set-info-user', async (_, data) => {
     store.set(STORE_USER_KEY, data);
 });
 
-//
-ipcMain.handle('getToken', async (_) => {
-    const token = store.get(STORE_TOKEN_KEY);
-    return token;
-});
-
-//
-ipcMain.handle('setToken', async (_, token) => {
-    store.set(STORE_TOKEN_KEY, token);
-});
-
-ipcMain.handle('logOut', async (_) => {
-    store.delete(STORE_TOKEN_KEY);
+ipcMain.handle('logout', async () => {
     store.delete(STORE_USER_KEY);
 });
 
 ipcMain.handle('get-api', async (_, url, data, option?) => {
-    const urlApi = path.join(domainWebServiceAdmin, url) + '?v=4&ENV=product';
-    return callRequest('get', urlApi, data, option);
+    return callRequest('get', url, data, option);
 });
 
 ipcMain.handle('post-api', async (_, url, data, option) => {
-    const urlApi = path.join(domainWebServiceAdmin, url) + '?v=4&ENV=product';
-    return callRequest('post', urlApi, data, option);
+    return callRequest('post', url, data, option);
 });
 
-ipcMain.handle('login', async (_, email, password) => {
-    const res = await callRequest('post', 'tungns/login/qver1_checkproviderlogin', { pvQV101: email, pvQV102: password });
-    if (res.status === 'success' && res.elements?.FK100 > 0) {
-        store.set(STORE_USER_KEY, res.elements);
-        store.set(STORE_TOKEN_KEY, res.elements?.TOKEN || '');
+ipcMain.handle('login', async (_, phone, password) => {
+    const res = await callRequest('post', 'supplier/v2/q100s/login', { QV108: phone, QV105: password });
+    if (res.status === 'success' && res.elements?.PQ100 > 0) {
+        const token = res.elements?.TOKEN || '';
+        const userData = {
+            data: res.elements,
+            token: token,
+            time: new Date().getTime(),
+            role: 'KTV'
+        }
+        store.set(STORE_USER_KEY, userData);
+        return userData;
     }
-    return res;
+    return null;
 });
 
 async function callRequest(method: string, url: string, data: any, option?: any) {
-    const urlApi = path.join('', url);
+    const urlApi = path.join(API_URL, url);
     let headers = {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        // 'x-client-id': 'webinar-flutter',
-        // 'x-client-token': '09881147f6b27b6eb626cf23efc53346d0920beebc4322b51e81bc76cecd4ebe',
-        authorization: '',
-        secret: '',
-        IP: ''
+        authorization: ''
     };
 
-    const token = store.get(STORE_TOKEN_KEY);
-    const user = store.get(STORE_USER_KEY);
+    const userInfo = store.get(STORE_USER_KEY);
+    const user = userInfo?.data || {};
+    const token = userInfo?.token || '';
     token && (headers['authorization'] = `Bearer ${token}`);
     option?.headers && (headers = { ...headers, ...option.headers });
 
-    if (user && data['FK100'] == null) {
-        data['FK100'] = user.FK100 || 0;
-        data['LOGIN'] = user.QV101 || '';
-    }
+    // if (user && data['FK100'] == null) {
+    //     data['FK100'] = user.FK100 || 0;
+    //     data['LOGIN'] = user.QV101 || '';
+    // }
 
     try {
         const response = await axios({
@@ -219,7 +207,6 @@ async function callRequest(method: string, url: string, data: any, option?: any)
 
 ipcMain.handle('get-devices', async () => {
     try {
-        // const hid = HID.devices();
         const hid = await HID.devicesAsync();
         const com = await SerialPort.list();
         return { hid, com };
@@ -231,7 +218,7 @@ ipcMain.handle('get-devices', async () => {
 
 ipcMain.handle('connect-com', async (_, path: string) => {
     const serialPort = new SerialPort({
-        path: path, //'/dev/tty.usbserial-1410', // hoặc COM3
+        path: path,
         baudRate: 9600
     });
 
@@ -254,13 +241,9 @@ ipcMain.handle('connect-com', async (_, path: string) => {
 ipcMain.handle('connect-hid', async (_, device: any) => {
     try {
         const deviceHid = new HID.HID(device.vendorId, device.productId);
-        // const deviceHid = new HID.HID(device.path);
-
-        //var deviceHid = await HID.HIDAsync.open(path);
-        // var deviceHid = await HID.HIDAsync.open(vid,pid);
     
         deviceHid.on('data', (data) => {
-            console.log('📥 Received from HID device:', data)
+            console.log('Received from HID device:', data)
             mainWindow?.webContents.send('hid-data', data);
         })
 

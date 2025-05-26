@@ -1,30 +1,38 @@
 import { defineStore } from "pinia";
 
 interface IUser {
-  token: string;
-  userInfo: any;
-  role: 'provider' | 'moderator'
+  data?: any;
+  token?: string;
+  time?: string;
+  role?: 'ADMIN' | 'KTV'
 }
 
 export const useAuthStore = defineStore("auth", {
   state: (): IUser => ({
-    token: "",
-    userInfo: null,
-    role: 'provider'
+    token: null,
+    data: null,
+    time: null,
+    role: 'KTV'
   }),
   actions: {
     async loadFromElectron() {
-      this.token = await window.Api.getToken();
-      this.userInfo = await window.Api.getInfoUser();
-      this.role = this.userInfo?.role || 'provider';
+      const userInfo: IUser = await window.Api.getInfoUser();
+      this.data = userInfo?.data || null;
+      this.role = userInfo?.role || 'KTV';
+      this.time = userInfo?.time || '';
+      this.token = userInfo?.token || '';
     },
-    async loginSuccess(token: string, user: any) {
-      this.token = token;
-      this.userInfo = user;
+    async loginSuccess(userInfo: IUser) {
+      this.data = userInfo?.data || null;
+      this.role = userInfo?.role || 'KTV';
+      this.time = userInfo?.time || '';
+      this.token = userInfo?.token || '';
     },
     async logout() {
       this.token = null;
-      this.userInfo = null;
+      this.data = null;
+      this.role = null;
+      this.time = null;
       await window.Api.logOut();
     },
   },

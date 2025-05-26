@@ -7,23 +7,17 @@ import os from 'os';
 contextBridge.exposeInMainWorld('platform', os.platform());
 
 contextBridge.exposeInMainWorld("Api", {
-    login: (email: string, password: string) => ipcRenderer.invoke("login", email, password),
+    login: (phone: string, password: string) => ipcRenderer.invoke("login", phone, password),
 
-    logOut: () => ipcRenderer.invoke("logOut"),
+    logOut: () => ipcRenderer.invoke("logout"),
 
-    getInfoUser: () => ipcRenderer.invoke("getInfoUser"),
+    getInfoUser: () => ipcRenderer.invoke("get-info-user"),
     
-    setInfoUser: (params: any) => ipcRenderer.invoke("setInfoUser", params),
-    
-    getToken: () => ipcRenderer.invoke("getToken"),
-
-    setToken: (params: any) => ipcRenderer.invoke("setToken", params),
+    setInfoUser: (params: any) => ipcRenderer.invoke("set-info-user", params),
 
     getApi: (path: string, data: any, options?: any) => ipcRenderer.invoke("get-api", path, data, options),
 
     postApi: (path: string, data: any, options?: any) => ipcRenderer.invoke("post-api", path, data, options),
-
-    getSources: (params: any) => ipcRenderer.invoke("get-sources", params),
     
     getVersion: () => version,
 
