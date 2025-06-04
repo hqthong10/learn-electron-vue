@@ -59,6 +59,7 @@
     "electron-window-state": "^5.0.3",
     "element-plus": "^2.9.7",
     "node-hid": "^3.1.2",
+    "node-rtsp-stream": "^0.0.9",
     "pinia": "^3.0.2",
     "serialport": "^13.0.0",
     "vue-router": "^4.5.1"

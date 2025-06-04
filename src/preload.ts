@@ -4,6 +4,32 @@ import { contextBridge, ipcRenderer } from "electron";
 import { version } from '../package.json';
 import os from 'os';
 
+export type CameraConfig = {
+  ip: string
+  port: number
+  username: string
+  password: string
+}
+
+export type CaptureResult = {
+  success: boolean
+  image?: string
+  timestamp?: string
+  error?: string
+}
+
+export type ConnectionResult = {
+  success: boolean
+  data?: any
+  error?: string
+}
+
+export type SaveResult = {
+  success: boolean
+  filePath?: string
+  error?: string
+}
+
 contextBridge.exposeInMainWorld('platform', os.platform());
 
 contextBridge.exposeInMainWorld("Api", {
@@ -33,5 +59,13 @@ contextBridge.exposeInMainWorld("Api", {
 
     onHID: (callback: (data: any) => void) => {
         ipcRenderer.on('hid-data', (_e, data) => callback(data))
-    }
+    },
+
+    testCameraConnection: (config: CameraConfig): Promise<ConnectionResult> => ipcRenderer.invoke('test-camera-connection', config),
+  
+  captureSnapshot: (config: CameraConfig): Promise<CaptureResult> => ipcRenderer.invoke('capture-snapshot', config),
+  
+  saveImage: (imageData: string, filename: string): Promise<SaveResult> =>  ipcRenderer.invoke('save-image', { imageData, filename }),
+  
+  getRtspUrl: (config: CameraConfig): Promise<string> => ipcRenderer.invoke('get-rtsp-url', config)
 });

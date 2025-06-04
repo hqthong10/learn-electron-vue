@@ -256,3 +256,83 @@ ipcMain.handle('connect-hid', async (_, device: any) => {
     }
     
 });
+
+// IPC handlers for camera operations
+ipcMain.handle('test-camera-connection', async (event, cameraConfig) => {
+  try {
+    const { ip, username, password, port } = cameraConfig
+    const auth = Buffer.from(`${username}:${password}`).toString('base64')
+    
+    const response = await axios.get(`http://${ip}:${port}/ISAPI/System/deviceInfo`, {
+      headers: {
+        'Authorization': `Basic ${auth}`
+      },
+      timeout: 5000
+    })
+    
+    return { success: true, data: response.data }
+  } catch (error: any) {
+    return { 
+      success: false, 
+      error: error.message || 'Không thể kết nối camera'
+    }
+  }
+})
+
+ipcMain.handle('capture-snapshot', async (event, cameraConfig) => {
+  try {
+    const { ip, username, password, port } = cameraConfig
+    const auth = Buffer.from(`${username}:${password}`).toString('base64')
+    
+    const response = await axios({
+      method: 'GET',
+      url: `http://${ip}:${port}/ISAPI/Streaming/channels/101/picture`,
+      headers: {
+        'Authorization': `Basic ${auth}`
+      },
+      responseType: 'arraybuffer',
+      timeout: 10000
+    })
+    
+    // Convert to base64
+    const base64Image = Buffer.from(response.data).toString('base64')
+    
+    return { 
+      success: true, 
+      image: `data:image/jpeg;base64,${base64Image}`,
+      timestamp: new Date().toISOString()
+    }
+  } catch (error: any) {
+    return { 
+      success: false, 
+      error: error.message || 'Không thể chụp ảnh'
+    }
+  }
+})
+
+ipcMain.handle('save-image', async (event, { imageData, filename }) => {
+  try {
+    const { filePath } = await dialog.showSaveDialog({
+      defaultPath: filename,
+      filters: [
+        { name: 'Images', extensions: ['jpg', 'jpeg', 'png'] }
+      ]
+    })
+    
+    if (filePath) {
+      // Remove data URL prefix
+      const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '')
+      writeFileSync(filePath, base64Data, 'base64')
+      return { success: true, filePath }
+    }
+    
+    return { success: false, error: 'Người dùng hủy lưu file' }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('get-rtsp-url', async (event, cameraConfig) => {
+  const { ip, username, password, port } = cameraConfig
+  return `rtsp://${username}:${password}@${ip}:554/Streaming/Channels/101`
+})
