@@ -1,14 +1,16 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 
-import ElementPlus from 'element-plus'
-import 'element-plus/theme-chalk/base.css'
-import './index.css';
+import ElementPlus from 'element-plus';
+import 'element-plus/dist/index.css';
+import 'element-plus/theme-chalk/base.css';
 
-import './styles/index.scss';
-import './styles/theme.scss';
+import '@/styles/index.css';
 import App from './App.vue';
 import router from './router';
+import { overloading } from '@/utils/overlay-loading';
+
+(globalThis as any).overloading = overloading;
 
 const app = createApp(App);
 

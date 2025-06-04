@@ -1,3 +1,7 @@
+// Cấu hình cho renderer process (frontend UI)
+// Môi trường: Browser environment
+// Chức năng: Vue/React/HTML UI, CSS, assets, etc.
+
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import AutoImport from 'unplugin-auto-import/vite';
@@ -27,7 +31,7 @@ export default defineConfig({
             }
         })
     ],
-    
+
     css: {
         postcss: './postcss.config.js', // Đảm bảo PostCSS được load
         preprocessorOptions: {

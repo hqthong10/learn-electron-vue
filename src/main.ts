@@ -3,7 +3,7 @@ import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import windowStateKeeper from 'electron-window-state';
 import axios from 'axios';
-import store from './electron/app-store';
+import store from './electron/store';
 import { SerialPort } from 'serialport';
 import HID from 'node-hid'
 import os from 'os'
