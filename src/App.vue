@@ -4,6 +4,7 @@
         <RouterView class="main-body"></RouterView>
     </div>
 </template>
+<style scoped src="@/styles/element.scss"></style>
 <style scoped src="./App.scss"></style>
 <script setup lang="ts">
 import { onMounted, onBeforeMount, computed } from 'vue';

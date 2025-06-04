@@ -1,5 +1,19 @@
-// :deep(.el-button) {
-//     background-color: $main-color;
-//     color: #fff;
-//     border: none;
-// }
+:deep(.el-button) {
+    background-color: $bg-main;
+    // color: #fff;
+    border: none;
+    height: 40px;
+}
+
+:deep(.el-input) {
+    .el-input__wrapper {
+        box-shadow: none;
+        border: 1px solid #d0cece;
+        border-radius: 8px;
+        max-height: unset;
+        height: 40px;
+        font-size: 1.125rem;
+        color: #3d3d3d;
+        font-weight: 700;
+    }
+}
