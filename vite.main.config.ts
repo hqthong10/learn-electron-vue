@@ -15,7 +15,7 @@ export default defineConfig({
     build: {
         chunkSizeWarningLimit: 1000,
         rollupOptions: {
-            external: ['serialport', 'node-hid']
+            external: ['serialport', 'node-hid', 'node-rtsp-stream']
         }
     },
 

@@ -192,7 +192,7 @@ const testConnection = async () => {
   connectionStatus.value = 'Đang kết nối...'
   
   try {
-    const result = await window.electronAPI.testCameraConnection(cameraConfig.value)
+    const result = await window.Api.testCameraConnection(cameraConfig.value)
     
     if (result.success) {
       isConnected.value = true
@@ -219,7 +219,7 @@ const captureImage = async () => {
   errorMessage.value = ''
   
   try {
-    const result = await window.electronAPI.captureSnapshot(cameraConfig.value)
+    const result = await window.Api.captureSnapshot(cameraConfig.value)
     
     if (result.success && result.image) {
       lastCapturedImage.value = result.image
@@ -252,7 +252,7 @@ const saveImage = async () => {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
     const filename = `hikvision-${timestamp}.jpg`
     
-    const result = await window.electronAPI.saveImage(lastCapturedImage.value, filename)
+    const result = await window.Api.saveImage(lastCapturedImage.value, filename)
     
     if (result.success) {
       alert(`Ảnh đã được lưu: ${result.filePath}`)

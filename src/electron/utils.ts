@@ -1,6 +1,6 @@
 import { app } from 'electron';
 import path from 'node:path';
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 
 export function getSavePath(fileName: string) {
     const platformSaveDir = app.getPath('videos'); // có thể là 'documents', 'desktop', etc.

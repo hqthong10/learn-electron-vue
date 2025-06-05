@@ -13,6 +13,7 @@
         </div>
         <div class="div-main">
             home
+            <camera />
         </div>
 
     </div>
