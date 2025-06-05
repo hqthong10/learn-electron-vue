@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import windowStateKeeper from 'electron-window-state';
@@ -7,6 +7,7 @@ import store from './electron/store';
 import { SerialPort } from 'serialport';
 import HID from 'node-hid'
 import os from 'os'
+import { writeFileSync } from 'node:fs';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
