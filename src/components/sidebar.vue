@@ -1,7 +1,8 @@
 <template>
     <div class="sidebar-main">
-        <RouterLink to="/home" class="bar-item"><UiIcon name="navi-home" />Home</RouterLink>
-        <RouterLink to="/profile" class="bar-item">Profile</RouterLink>
+        <RouterLink to="/home" class="bar-item"><ui-icon name="navi-home" />Home</RouterLink>
+        <RouterLink to="/profile" class="bar-item"><ui-icon name="alarm" />Profile</RouterLink>
+        <RouterLink to="/setting" class="bar-item"><ui-icon name="avatar" />Cài đặt</RouterLink>
         <div class="space-full"></div>
         <div class="bar-item">
             <label>{{ name }}</label>

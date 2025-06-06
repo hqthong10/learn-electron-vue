@@ -22,7 +22,10 @@
                 "project": "./tsconfig.json"
             },
             "alias": {
-                "map": [["@", "./src"]],
+                "map": [
+                    ["@", "./src"],
+                    ["~", "./"]
+                ],
                 "extensions": [".js", ".ts", ".vue", ".json"]
             }
         }

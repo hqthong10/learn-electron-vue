@@ -25,22 +25,3 @@ export function getFfmpegPath() {
   }
 }
 
-export const getGPUUsage = async () => {
-    // try {
-    //     // Try to get NVIDIA GPU usage if available
-    //     import nvidia from 'node-nvidia-ml';
-    //     await nvidia.init();
-    //     const deviceCount = await nvidia.deviceGetCount();
-
-    //     if (deviceCount > 0) {
-    //         const device = await nvidia.deviceGetHandleByIndex(0);
-    //         const utilization = await nvidia.deviceGetUtilizationRates(device);
-    //         return utilization.gpu;
-    //     }
-    // } catch (error) {
-    //     // NVIDIA ML not available or no NVIDIA GPU
-    // }
-
-    // Mock GPU usage for demonstration
-    return Math.round(Math.random() * 40 + 20); // 20-60% range
-};
