@@ -152,7 +152,7 @@ const testConnection = async () => {
     connectionStatus.value = 'Đang kết nối...'
 
     try {
-        const result = await window.Api.testCameraConnection(cameraConfig.value)
+        const result = await window.Api.testCameraConnection({ ...cameraConfig.value})
         if (result.success) {
             isConnected.value = true
             connectionStatus.value = 'Đã kết nối'
@@ -178,7 +178,7 @@ const captureImage = async () => {
     errorMessage.value = ''
 
     try {
-        const result = await window.Api.captureSnapshot(cameraConfig.value)
+        const result = await window.Api.captureSnapshot({ ...cameraConfig.value })
 
         if (result.success && result.image) {
             lastCapturedImage.value = result.image

@@ -1,5 +1,5 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
-import { writeFileSync } from 'node:fs';
+import fs, { writeFileSync } from 'node:fs';
 import axios from 'axios';
 import store from './store';
 import { SerialPort } from 'serialport';
@@ -7,6 +7,8 @@ import HID from 'node-hid';
 import { API_URL, STORE_SETTING_KEY, STORE_USER_KEY } from './constants';
 import callRequest from './api';
 import path from 'node:path';
+import { captureFromRTSP } from './camera';
+import { connectToCamera, getRTSPUrl } from './onvif-camera';
 
 let mainWindow: BrowserWindow;
 
@@ -240,5 +242,26 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
                 })
                 .run();
         });
+    });
+
+    ipcMain.handle('capture-plate', async (_, rtspUrl: string) => {
+        try {
+            const imgPath = await captureFromRTSP(rtspUrl);
+            return imgPath; // trả về đường dẫn ảnh
+        } catch (err) {
+            console.error('Chụp ảnh thất bại:', err);
+            return null;
+        }
+    });
+
+    ipcMain.handle('get-rtsp-url', async (_, ip: string, user: string, pass: string) => {
+        try {
+            const cam = await connectToCamera(ip, user, pass);
+            const rtspUrl = await getRTSPUrl(cam);
+            return rtspUrl;
+        } catch (err) {
+            console.error('Kết nối ONVIF thất bại:', err);
+            return null;
+        }
     });
 }

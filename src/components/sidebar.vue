@@ -1,6 +1,6 @@
 <template>
     <div class="sidebar-main">
-        <RouterLink to="/home" class="bar-item"><ui-icon name="navi-home" />Home</RouterLink>
+        <RouterLink to="/home" class="bar-item"><ui-icon name="home" />Home</RouterLink>
         <RouterLink to="/profile" class="bar-item"><ui-icon name="alarm" />Profile</RouterLink>
         <RouterLink to="/setting" class="bar-item"><ui-icon name="avatar" />Cài đặt</RouterLink>
         <div class="space-full"></div>
@@ -12,7 +12,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import UiIcon from '@/components/ui-icon.vue';
 
 const authStore = useAuthStore();
 

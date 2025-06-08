@@ -1,6 +1,6 @@
 <template>
     <div class="main-layout">
-        <SideBar v-if="isLogin"></SideBar>
+        <SideBar></SideBar>
         <RouterView class="main-body"></RouterView>
     </div>
 </template>

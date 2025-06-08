@@ -22,6 +22,10 @@ declare global {
             captureSnapshot: (config: CameraConfig) => Promise<CaptureResult>
             saveImage: (imageData: string, filename: string) => Promise<SaveResult>
             getRtspUrl: (config: CameraConfig) => Promise<string>
+            connectCamera: (config: any) => any
+            captureScreenshot: (config: any) => any
+            capturePlateImage: (config: any) => any
+            getRtspUrl2: (ip: string, user: string, pass: string) => any
         }
     }
 }

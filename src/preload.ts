@@ -75,5 +75,12 @@ contextBridge.exposeInMainWorld('Api', {
 
     saveImage: (imageData: string, filename: string): Promise<SaveResult> => ipcRenderer.invoke('save-image', { imageData, filename }),
 
-    getRtspUrl: (config: CameraConfig): Promise<string> => ipcRenderer.invoke('get-rtsp-url', config)
+    getRtspUrl: (config: CameraConfig): Promise<string> => ipcRenderer.invoke('get-rtsp-url', config),
+
+    connectCamera: (config: CameraConfig): Promise<string> => ipcRenderer.invoke('connect-camera', config),
+
+    capturePlateImage: (rtspUrl: string) => ipcRenderer.invoke('capture-plate', rtspUrl),
+
+     getRtspUrl2: (ip: string, user: string, pass: string) =>
+    ipcRenderer.invoke('get-rtsp-url', ip, user, pass),
 });
