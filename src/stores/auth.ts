@@ -33,7 +33,7 @@ export const useAuthStore = defineStore("auth", {
       this.data = null;
       this.role = null;
       this.time = null;
-      await window.Api.logOut();
+      await window.Api.logout();
     },
   },
 });

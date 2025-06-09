@@ -129,8 +129,7 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         }
     });
 
-    // IPC handlers for camera operations
-    ipcMain.handle('test-camera-connection', async (event, cameraConfig) => {
+    ipcMain.handle('test-connect-cam-hik', async (event, cameraConfig) => {
         try {
             const { ip, username, password, port } = cameraConfig;
             const auth = Buffer.from(`${username}:${password}`).toString('base64');
@@ -151,7 +150,7 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         }
     });
 
-    ipcMain.handle('capture-snapshot', async (event, cameraConfig) => {
+    ipcMain.handle('cam-hik-capture', async (event, cameraConfig) => {
         try {
             const { ip, username, password, port } = cameraConfig;
             const auth = Buffer.from(`${username}:${password}`).toString('base64');
@@ -203,14 +202,21 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
     });
 
     ipcMain.handle('get-rtsp-url', async (event, cameraConfig) => {
+        // rtsplink: 'rtsp://viewer:FB1D2631C12FE8F7@117.3.2.18:554',
+        // rtsplink: 'rtsp://viewer:FB1D2631C12FE8F7@14.241.131.216:553',
+        // rtsplink: 'rtsp://viewer:FB1D2631C12FE8F7EE8951663A8A108@14.241.245.161:554',
+        // rtsplink: 'rtsp://viewer:FB1D2631C12FE8F7EE8951663A8A108@115.78.11.232:554',
+        // rtsplink: 'rtsp://viewer:FB1D2631C12FE8F7EE8951663A8A108@113.176.112.174:554',
         const { ip, username, password, port } = cameraConfig;
-        return `rtsp://${username}:${password}@${ip}:554/Streaming/Channels/101`;
+        return `rtsp://${username}:${password}@${ip}:${port}/Streaming/Channels/101`;
+        // return `rtsp://${username}:${password}@${ip}:${port}`;
     });
 
     // Handle camera connection and streaming
-    ipcMain.handle('connect-camera', async (event, config) => {
+    ipcMain.handle('connect-cam-rtsp', async (event, config) => {
         try {
             const { ip, username, password, port = 554, channel = 1 } = config;
+
             const rtspUrl = `rtsp://${username}:${password}@${ip}:${port}/Streaming/Channels/${channel}01`;
 
             return { success: true, rtspUrl };
@@ -219,9 +225,8 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         }
     });
 
-    // Handle screenshot capture
-    ipcMain.handle('capture-screenshot', async (event, rtspUrl) => {
-        return new Promise((resolve, reject) => {
+    ipcMain.handle('cam-rtsp-capture', async (_, rtspUrl: string) => {
+        try {
             const outputPath = path.join(__dirname, 'screenshots', `capture_${Date.now()}.jpg`);
 
             // Ensure screenshots directory exists
@@ -230,23 +235,7 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
                 fs.mkdirSync(screenshotsDir, { recursive: true });
             }
 
-            ffmpeg(rtspUrl)
-                .inputOptions(['-rtsp_transport', 'tcp', '-analyzeduration', '1000000', '-probesize', '1000000'])
-                .outputOptions(['-vframes', '1', '-q:v', '2'])
-                .output(outputPath)
-                .on('end', () => {
-                    resolve({ success: true, path: outputPath });
-                })
-                .on('error', (err) => {
-                    resolve({ success: false, error: err.message });
-                })
-                .run();
-        });
-    });
-
-    ipcMain.handle('capture-plate', async (_, rtspUrl: string) => {
-        try {
-            const imgPath = await captureFromRTSP(rtspUrl);
+            const imgPath = await captureFromRTSP(rtspUrl, outputPath);
             return imgPath; // trả về đường dẫn ảnh
         } catch (err) {
             console.error('Chụp ảnh thất bại:', err);
@@ -254,9 +243,10 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         }
     });
 
-    ipcMain.handle('get-rtsp-url', async (_, ip: string, user: string, pass: string) => {
+    ipcMain.handle('get-rtsp-url-onvif', async (_, config: any) => {
         try {
-            const cam = await connectToCamera(ip, user, pass);
+            const {ip, username, password} = config;
+            const cam = await connectToCamera(ip, username, password);
             const rtspUrl = await getRTSPUrl(cam);
             return rtspUrl;
         } catch (err) {
@@ -264,4 +254,6 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
             return null;
         }
     });
+
+    
 }

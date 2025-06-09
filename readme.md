@@ -51,3 +51,6 @@ printer.printDirect({
   success: () => console.log('printed'),
   error: (err) => console.error(err),
 });
+
+
+Cam DS-2CD1121G2-LIU

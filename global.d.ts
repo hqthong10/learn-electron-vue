@@ -18,14 +18,15 @@ declare global {
             connectHID: (device: any) => any
             onCOM: (cb: (data: string) => void) => void
             onHID: (cb: (data: string) => void) => void
-            testCameraConnection: (config: CameraConfig) => Promise<ConnectionResult>
-            captureSnapshot: (config: CameraConfig) => Promise<CaptureResult>
+            testConnectCamHik: (config: CameraConfig) => Promise<ConnectionResult>
+            camHikCapture: (config: CameraConfig) => Promise<CaptureResult>
             saveImage: (imageData: string, filename: string) => Promise<SaveResult>
             getRtspUrl: (config: CameraConfig) => Promise<string>
-            connectCamera: (config: any) => any
-            captureScreenshot: (config: any) => any
+            connectCameraRtsp: (config: any) => any
+            camRtspCapture: (config: any) => any
+            
             capturePlateImage: (config: any) => any
-            getRtspUrl2: (ip: string, user: string, pass: string) => any
+            getRtspUrlOnvif: (config: any) => any
         }
     }
 }

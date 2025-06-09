@@ -69,18 +69,17 @@ contextBridge.exposeInMainWorld('Api', {
         ipcRenderer.on('hid-data', (_e, data) => callback(data));
     },
 
-    testCameraConnection: (config: CameraConfig): Promise<ConnectionResult> => ipcRenderer.invoke('test-camera-connection', config),
+    testConnectCamHik: (config: CameraConfig): Promise<ConnectionResult> => ipcRenderer.invoke('test-connect-cam-hik', config),
 
-    captureSnapshot: (config: CameraConfig): Promise<CaptureResult> => ipcRenderer.invoke('capture-snapshot', config),
+    camHikCapture: (config: CameraConfig): Promise<CaptureResult> => ipcRenderer.invoke('cam-hik-capture', config),
 
     saveImage: (imageData: string, filename: string): Promise<SaveResult> => ipcRenderer.invoke('save-image', { imageData, filename }),
 
     getRtspUrl: (config: CameraConfig): Promise<string> => ipcRenderer.invoke('get-rtsp-url', config),
 
-    connectCamera: (config: CameraConfig): Promise<string> => ipcRenderer.invoke('connect-camera', config),
+    connectCameraRtsp: (config: CameraConfig): Promise<string> => ipcRenderer.invoke('connect-cam-rtsp', config),
 
-    capturePlateImage: (rtspUrl: string) => ipcRenderer.invoke('capture-plate', rtspUrl),
+    camRtspCapture: (rtspUrl: string) => ipcRenderer.invoke('cam-rtsp-capture', rtspUrl),
 
-     getRtspUrl2: (ip: string, user: string, pass: string) =>
-    ipcRenderer.invoke('get-rtsp-url', ip, user, pass),
+    getRtspUrlOnvif: (config: any) => ipcRenderer.invoke('get-rtsp-url-onvif', config),
 });

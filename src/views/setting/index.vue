@@ -2,13 +2,13 @@
     <div class="setting-view">
         <el-tabs v-model="activeName" class="demo-tabs">
             <el-tab-pane label="Hik-connect" name="first">
-                <camera />
+                <camera-hik />
             </el-tab-pane>
             <el-tab-pane label="RTSP" name="second">
                 <camera-rtsp />
             </el-tab-pane>
-            <el-tab-pane label="V2" name="three">
-                <camera-v2 />
+            <el-tab-pane label="ONVIf" name="three">
+                <camera-onvif />
             </el-tab-pane>
         </el-tabs>
     </div>

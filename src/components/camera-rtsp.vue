@@ -35,6 +35,7 @@
         </div>
 
         <div v-if="isConnected" class="camera-controls">
+            {{ rtspUrl }}
             <div class="video-container">
                 <video ref="videoElement" :src="rtspUrl" autoplay muted controls @loadstart="onVideoLoadStart"
                     @error="onVideoError">
@@ -48,14 +49,15 @@
                 </button>
 
                 <div v-if="lastScreenshot" class="screenshot-info">
+                    <p>{{ lastScreenshot.dataUrl || 'nolink' }}</p>
                     <p>Last screenshot: {{ lastScreenshot.timestamp }}</p>
                     <img :src="lastScreenshot.dataUrl" alt="Screenshot" class="thumbnail" />
                 </div>
             </div>
-        </div>
 
-        <div v-if="error" class="error-message">
-            {{ error }}
+            <div v-if="error" class="error-message">
+                {{ error }}
+            </div>
         </div>
     </div>
 </template>
@@ -87,10 +89,10 @@ export default {
             error.value = '';
 
             try {
-                const result = await window.Api.connectCamera({ ...config });
+                const result = await window.Api.getRtspUrl({ ...config });
 
-                if (result.success) {
-                    rtspUrl.value = result.rtspUrl;
+                if (result) {
+                    rtspUrl.value = result;
                     isConnected.value = true;
 
                     // For direct RTSP streaming in video element (may not work in all browsers)
@@ -166,11 +168,16 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.camera-container{
+    display: flex;
+    gap: 10px;
+}
 .camera-container {
     padding: 20px;
     max-width: 800px;
     margin: 0 auto;
+
 }
 
 .camera-config {

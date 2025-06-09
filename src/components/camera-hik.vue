@@ -1,9 +1,6 @@
 <template>
-    <div id="app">
+    <div class="camera-hik">
         <div class="container">
-            <h1>Cài đặt Camera</h1>
-
-            <!-- Camera Configuration -->
             <div class="config-section">
                 <h2>Cấu hình Camera</h2>
                 <div class="config-grid">
@@ -152,7 +149,7 @@ const testConnection = async () => {
     connectionStatus.value = 'Đang kết nối...'
 
     try {
-        const result = await window.Api.testCameraConnection({ ...cameraConfig.value})
+        const result = await window.Api.testConnectCamHik({ ...cameraConfig.value })
         if (result.success) {
             isConnected.value = true
             connectionStatus.value = 'Đã kết nối'
@@ -178,7 +175,7 @@ const captureImage = async () => {
     errorMessage.value = ''
 
     try {
-        const result = await window.Api.captureSnapshot({ ...cameraConfig.value })
+        const result = await window.Api.camHikCapture({ ...cameraConfig.value })
 
         if (result.success && result.image) {
             lastCapturedImage.value = result.image
@@ -239,16 +236,17 @@ const formatTime = (timestamp: string) => {
 }
 
 // Load saved config on mount
-onMounted(() => {
-    const savedConfig = localStorage.getItem('hikvision-config')
-    if (savedConfig) {
-        try {
-            const config = JSON.parse(savedConfig)
-            cameraConfig.value = { ...cameraConfig.value, ...config }
-        } catch (e) {
-            console.error('Failed to load saved config:', e)
-        }
-    }
+onMounted(async () => {
+    const savedConfig = await window.Api.getSetting()
+    console.log('thong', savedConfig);
+    // if (savedConfig) {
+    //     try {
+    //         const config = JSON.parse(savedConfig)
+    //         cameraConfig.value = { ...cameraConfig.value, ...config }
+    //     } catch (e) {
+    //         console.error('Failed to load saved config:', e)
+    //     }
+    // }
 })
 
 // Save config when changed
@@ -257,45 +255,38 @@ const saveConfig = () => {
 }
 </script>
 
-<style scoped>
-#app {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
+<style scoped lang="scss">
+.camera-hik {
     padding: 20px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
+    min-height: calc(100vh - 60px);
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        padding: 15px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        color: #34495e;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
 
-h1 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 30px;
-    font-size: 2.5em;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-}
 
-h2 {
-    color: #34495e;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
 
 .config-section,
 .controls-section,
 .image-section,
 .gallery-section {
-    margin-bottom: 30px;
-    padding: 20px;
+    margin-bottom: 10px;
+    padding: 10px;
     background: #f8f9fa;
     border-radius: 10px;
     border: 1px solid #dee2e6;
