@@ -208,8 +208,8 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         // rtsplink: 'rtsp://viewer:FB1D2631C12FE8F7EE8951663A8A108@115.78.11.232:554',
         // rtsplink: 'rtsp://viewer:FB1D2631C12FE8F7EE8951663A8A108@113.176.112.174:554',
         const { ip, username, password, port } = cameraConfig;
-        return `rtsp://${username}:${password}@${ip}:${port}/Streaming/Channels/101`;
-        // return `rtsp://${username}:${password}@${ip}:${port}`;
+        // return `rtsp://${username}:${password}@${ip}:${port}/Streaming/Channels/101`;
+        return `rtsp://${username}:${password}@${ip}:${port}`;
     });
 
     // Handle camera connection and streaming
@@ -217,7 +217,8 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         try {
             const { ip, username, password, port = 554, channel = 1 } = config;
 
-            const rtspUrl = `rtsp://${username}:${password}@${ip}:${port}/Streaming/Channels/${channel}01`;
+            // const rtspUrl = `rtsp://${username}:${password}@${ip}:${port}/Streaming/Channels/${channel}01`;
+            const rtspUrl = `rtsp://${username}:${password}@${ip}:${port}`;
 
             return { success: true, rtspUrl };
         } catch (error) {
@@ -245,9 +246,12 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
 
     ipcMain.handle('get-rtsp-url-onvif', async (_, config: any) => {
         try {
+            console.log('gogogo');
             const {ip, username, password} = config;
             const cam = await connectToCamera(ip, username, password);
+            console.log('gogogo cam', cam);
             const rtspUrl = await getRTSPUrl(cam);
+            console.log('gogogo rtspUrl', rtspUrl);
             return rtspUrl;
         } catch (err) {
             console.error('Kết nối ONVIF thất bại:', err);

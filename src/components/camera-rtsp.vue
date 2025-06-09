@@ -117,8 +117,8 @@ export default {
             error.value = '';
 
             try {
-                const result = await window.Api.captureScreenshot(rtspUrl.value);
-
+                const result = await window.Api.camRtspCapture(rtspUrl.value);
+                console.log(result)
                 if (result.success) {
                     // Convert file path to data URL for display
                     const fs = require('fs');
