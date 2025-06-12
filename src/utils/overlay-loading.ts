@@ -14,3 +14,5 @@ export const overloading = {
     _visible: visible,
     _text: text
 };
+
+(globalThis as any).overloading = overloading;

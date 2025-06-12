@@ -32,7 +32,7 @@ export type SaveResult = {
 
 contextBridge.exposeInMainWorld('platform', os.platform());
 
-contextBridge.exposeInMainWorld('Api', {
+const electronApi = {
     login: (phone: string, password: string) => ipcRenderer.invoke('login', phone, password),
 
     logout: () => ipcRenderer.invoke('logout'),
@@ -82,4 +82,8 @@ contextBridge.exposeInMainWorld('Api', {
     camRtspCapture: (rtspUrl: string) => ipcRenderer.invoke('cam-rtsp-capture', rtspUrl),
 
     getRtspUrlOnvif: (config: any) => ipcRenderer.invoke('get-rtsp-url-onvif', config),
-});
+}
+
+contextBridge.exposeInMainWorld('Api', electronApi);
+
+export type ElectronApi = typeof electronApi;

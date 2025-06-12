@@ -8,9 +8,6 @@ import 'element-plus/theme-chalk/base.css';
 import '@/styles/index.css';
 import App from './App.vue';
 import router from './router';
-import { overloading } from '@/utils/overlay-loading';
-
-(globalThis as any).overloading = overloading;
 
 const app = createApp(App);
 
@@ -20,8 +17,3 @@ app.use(createPinia());
 app.use(router);
 
 app.mount('#app');
-
-
-// window.Api.ipcRenderer.on('rfid-tag', (event, tag) => {
-//   console.log('Received tag:', tag)
-// })

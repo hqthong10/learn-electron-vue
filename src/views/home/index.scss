@@ -5,6 +5,8 @@
     background: #f5f5f5;
     align-items: flex-start;
     justify-content: flex-start;
+    padding: 5px;
+    gap: 5px;
 
     .div-left{
         display: flex;
@@ -12,7 +14,26 @@
         flex: none;
         width: 350px;
         height: 100%;
-        background: #f5f5f5;
+        border-radius: 3px;
+        background-color: #ccc;
+        padding: 10px;
+        gap: 15px;
+
+        .div-item{
+            display: flex;
+            flex-flow: column;
+            gap: 5px;
+
+            span {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 40px;
+                width: 100%;
+                background-color: #fff;
+                font-size: 26px;
+            }
+        }
     }
 
     .div-main {
@@ -22,13 +43,16 @@
         justify-content: flex-start;
         width: 100%;
         background: #fff;
-        gap: 10px;
+        gap: 5px;
+        border-radius: 3px;
         
         .display-item {
             background-color: #ccc;
             display: flex;
             width: calc(50% - 5px);
             aspect-ratio: 16 / 9;
+            border-radius: 3px;
+            overflow: hidden;
         }
     }
 }

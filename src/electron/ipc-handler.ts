@@ -63,7 +63,7 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
     });
 
     ipcMain.handle('login', async (_, phone, password) => {
-        const res = await callRequest('post', 'supplier/v2/q100s/login', { QV108: phone, QV105: password });
+        const res = await callRequest('post', path.join(API_URL, 'supplier/v2/q100s/login'), { QV108: phone, QV105: password });
         if (res.status === 'success' && res.elements?.PQ100 > 0) {
             const token = res.elements?.TOKEN || '';
             const userData = {

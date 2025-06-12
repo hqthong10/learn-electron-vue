@@ -1,7 +1,8 @@
 <template>
     <div class="main-layout">
-        <SideBar></SideBar>
+        <sidebar></sidebar>
         <RouterView class="main-body"></RouterView>
+        <ui-overlay-loading />
     </div>
 </template>
 <style scoped src="@/styles/element.scss"></style>
@@ -10,7 +11,6 @@
 import { onMounted, onBeforeMount, computed } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
-import SideBar from '@/components/SideBar.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();

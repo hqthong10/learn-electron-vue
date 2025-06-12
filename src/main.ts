@@ -1,10 +1,11 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
 import windowStateKeeper from 'electron-window-state';
 import os from 'os'
 
 import { setupIpcHandlers, windowAllClosed } from './electron/ipc-handler';
+import { createAppMenu } from './electron/menu-bar';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -35,6 +36,8 @@ const createWindow = () => {
     });
 
     mainWindowState.manage(mainWindow);
+
+    createAppMenu(mainWindow);
 
     // and load the index.html of the app.
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
