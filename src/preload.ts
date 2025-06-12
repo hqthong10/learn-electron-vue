@@ -55,15 +55,9 @@ const electronApi = {
 
     getVersion: () => version,
 
-    getDevices: () => ipcRenderer.invoke('get-devices'),
-
-    connectCOM: (path: string) => ipcRenderer.invoke('connect-com', path),
+    getHidDevices: () => ipcRenderer.invoke('get-hid-devices'),
 
     connectHID: (data: any) => ipcRenderer.invoke('connect-hid', data),
-
-    onCOM: (callback: (data: string) => void) => {
-        ipcRenderer.on('com-data', (_e, data) => callback(data));
-    },
 
     onHID: (callback: (data: any) => void) => {
         ipcRenderer.on('hid-data', (_e, data) => callback(data));

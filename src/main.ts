@@ -31,6 +31,7 @@ const createWindow = () => {
             // contextIsolation: true, // false = Để dùng mediaDevices trực tiếp
             sandbox: false,
             devTools: true,
+            webSecurity: false,
             preload: path.join(__dirname, 'preload.js')
         }
     });

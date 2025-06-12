@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import fs, { writeFileSync } from 'node:fs';
 import axios from 'axios';
 import store from './store';
@@ -78,42 +78,20 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         return null;
     });
 
-    ipcMain.handle('get-devices', async () => {
+    ipcMain.handle('get-hid-devices', async () => {
         try {
-            const hid = await HID.devicesAsync();
-            const com = await SerialPort.list();
-            return { hid, com };
+            return await HID.devicesAsync();
         } catch (e) {
             console.log(e);
             return { hid: [], com: [] };
         }
     });
 
-    ipcMain.handle('connect-com', async (_, path: string) => {
-        const serialPort = new SerialPort({
-            path: path,
-            baudRate: 9600
-        });
-
-        serialPort.on('open', () => {
-            console.log(`Đã kết nối tới ${path}`);
-        });
-
-        serialPort.on('error', (err) => {
-            console.error('Lỗi:', err.message);
-        });
-
-        serialPort.on('data', (data: any) => {
-            const tag = data.toString().trim();
-            console.log('COM Tag:', tag);
-            // Gửi tag về renderer nếu cần
-            mainWindow?.webContents.send('com-tag', tag);
-        });
-    });
-
     ipcMain.handle('connect-hid', async (_, device: any) => {
         try {
+            console.log(device);
             const deviceHid = new HID.HID(device.vendorId, device.productId);
+            // let deviceHid = new HID.HID(device.path);
 
             deviceHid.on('data', (data) => {
                 console.log('Received from HID device:', data);
@@ -122,10 +100,14 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
 
             deviceHid.on('error', (err) => {
                 console.error('HID Error:', err);
+                deviceHid.close();
             });
             return true;
+
+         
         } catch (err) {
             console.error('Error connecting to HID device:', err);
+            return false;
         }
     });
 
@@ -228,10 +210,10 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
 
     ipcMain.handle('cam-rtsp-capture', async (_, rtspUrl: string) => {
         try {
-            const outputPath = path.join(__dirname, 'screenshots', `capture_${Date.now()}.jpg`);
+            const outputPath = path.join(app.getPath('userData'), `images/capture_${Date.now()}.jpg`);
 
             // Ensure screenshots directory exists
-            const screenshotsDir = path.join(__dirname, 'screenshots');
+            const screenshotsDir = path.join(app.getPath('userData'), 'images');
             if (!fs.existsSync(screenshotsDir)) {
                 fs.mkdirSync(screenshotsDir, { recursive: true });
             }

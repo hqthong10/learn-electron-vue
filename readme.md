@@ -54,3 +54,7 @@ printer.printDirect({
 
 
 Cam DS-2CD1121G2-LIU
+
+app.getPath('userData'): File ảnh dùng trong app
+app.getPath('pictures'): Người dùng cần dễ tìm
+app.getPath('temp'): Tệp tạm / test	

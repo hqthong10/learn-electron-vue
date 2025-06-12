@@ -4,8 +4,7 @@
     </span>
 </template>
 <script setup lang="ts">
-import { defineAsyncComponent, computed } from 'vue'
-import { useAttrs } from 'vue'
+import { defineAsyncComponent, computed, useAttrs } from 'vue';
 
 const props = defineProps<{
     name: string
