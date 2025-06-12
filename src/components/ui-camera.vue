@@ -1,7 +1,6 @@
 <template>
     <div class="ui-camera">
         <div v-if="!isConnected">
-            <span>{{ rtspUrl }}</span>
             <el-button @click.native="connectCamera">Connect</el-button>
         </div>
 
@@ -28,7 +27,6 @@ const config = reactive({
 
 const isConnected = ref(false);
 const rtspUrl = ref('');
-const lastScreenshot = ref(null);
 const videoElement = ref(null);
 
 onMounted(async () => {
@@ -45,18 +43,19 @@ const connectCamera = async () => {
 const capture = async () => {
     const result = await window.Api.camRtspCapture(rtspUrl.value);
     console.log(result)
-    if (result) {
-        const imageBuffer = fs.readFileSync(result);
-        const base64Image = imageBuffer.toString('base64');
-        const dataUrl = `data:image/jpeg;base64,${base64Image}`;
 
-        return {
-            path: result,
-            dataUrl: dataUrl,
-            timestamp: new Date().toLocaleString()
-        };
-    }
-    return null;
+    // if (result) {
+    //     const imageBuffer = fs.readFileSync(result);
+    //     const base64Image = imageBuffer.toString('base64');
+    //     const dataUrl = `data:image/jpeg;base64,${base64Image}`;
+
+    //     return {
+    //         path: result,
+    //         dataUrl: dataUrl,
+    //         timestamp: new Date().toLocaleString()
+    //     };
+    // }
+    return result;
 };
 
 const onVideoLoadStart = () => {

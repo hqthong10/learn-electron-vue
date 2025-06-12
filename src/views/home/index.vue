@@ -15,7 +15,7 @@
         </div>
         <div class="div-main">
             <div class="display-item"><img v-if="image1.length > 0" :src="image1"></div>
-            <div class="display-item">{{ image1 }}</div>
+            <div class="display-item">2</div>
             <div class="display-item">3</div>
             <div class="display-item">4</div>
             <div class="display-item"><ui-camera ref="cameraRef" /></div>
@@ -65,7 +65,7 @@ onMounted(async () => {
 const capture = async () => {
     const rs = await cameraRef.value.capture();
     console.log(rs);
-    image1.value = rs.path;
+    image1.value = rs;
 }
 
 </script>
