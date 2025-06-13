@@ -75,6 +75,9 @@ const electronApi = {
     // onvif
     getRtspUrlOnvif: (config: any) => ipcRenderer.invoke('get-rtsp-url-onvif', config),
 
+    //
+    processImage: (imagePath: string) => ipcRenderer.invoke('process-image', imagePath),
+
 }
 
 contextBridge.exposeInMainWorld('Api', electronApi);

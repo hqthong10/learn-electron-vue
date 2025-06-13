@@ -100,7 +100,7 @@ const onChangeHidDevice = () => {
     const devi = hids.value.find((d: IDevice) => d.productId === hidDevice.value);
     console.log('device selected', devi);
 
-    if(!devi || devi.interface === 0) {
+    if(devi == null || devi?.interface === 0) {
         keyEventListen = window.addEventListener('keydown', (e) => {
             const currentTime = Date.now();
             if (currentTime - lastKeyTime > 100) {
@@ -120,7 +120,7 @@ const onChangeHidDevice = () => {
         });
     }
 
-    if(devi.interface === 1) {
+    if(devi?.interface === 1) {
         window.Api.connectHID(JSON.parse(JSON.stringify({...devi})));
         onHidListen = window.Api.onHID((data) => {
             console.log('onHID', data);
@@ -137,11 +137,24 @@ const capture = async () => {
 
 const selectImage = () => {
     attachChooseFile('image/*', false, async (files: File[], event: Event) => {
-        // const t = await processImage(files[0]);
-        // console.log('kết qua', t);
+        const file = files[0]
+        if (!file) return;
 
-        const t = await detectPlateFromImage(files[0]);
-        console.log('kết qua', t);
+        const t = await detectPlateFromImage(file);
+        // const t2 = await window.Api.processImage(file.path)
+
+        console.log('kết qua 1', t);
+        // console.log('kết qua 2', t2);
+
+        // Gửi file ảnh lên main process
+        const reader = new FileReader();
+
+        reader.onload = async () => {
+            // const t = await processImage(reader.result);
+            // console.log('kết qua', t);
+        };
+
+        reader.readAsArrayBuffer(file);
     });
 }
 

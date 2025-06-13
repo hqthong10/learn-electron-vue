@@ -1,5 +1,6 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import fs, { writeFileSync } from 'node:fs';
+import { spawn } from 'child_process';
 import axios from 'axios';
 import store from './store';
 import { SerialPort } from 'serialport';
@@ -103,8 +104,8 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         try {
             const ports = await SerialPort.list();
             // console.log('Available serial ports:', ports);
-            return ports.filter(port => 
-                port.manufacturer?.includes('FTDI') || 
+            return ports.filter(port =>
+                port.manufacturer?.includes('FTDI') ||
                 port.manufacturer?.includes('Silicon Labs') ||
                 port.productId?.includes('USB')
             );
@@ -127,7 +128,7 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
                 console.log('RFID Card detected:', cardId.trim());
                 mainWindow?.webContents.send('rfid-data', cardId.trim());
             });
-            
+
             rfidPort.on('error', (err) => {
                 console.error('RFID Reader error:', err);
             });
@@ -167,7 +168,7 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
             });
             return true;
 
-         
+
         } catch (err) {
             console.error('Error connecting to HID device:', err);
             return false;
@@ -226,7 +227,7 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         }
     });
 
-    
+
 
     ipcMain.handle('cam-rtsp-url', async (event, cameraConfig) => {
         // rtsplink: 'rtsp://viewer:FB1D2631C12FE8F7@117.3.2.18:554',
@@ -275,7 +276,7 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
     ipcMain.handle('get-rtsp-url-onvif', async (_, config: any) => {
         try {
             console.log('gogogo');
-            const {ip, username, password} = config;
+            const { ip, username, password } = config;
             const cam = await connectToCamera(ip, username, password);
             console.log('gogogo cam', cam);
             const rtspUrl = await getRTSPUrl(cam);
@@ -286,5 +287,18 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
             return null;
         }
     });
-    
+
+    ipcMain.handle('process-image', async (event, imagePath) => {
+        const { PythonShell } = require('python-shell');
+
+        return new Promise((resolve, reject) => {
+            // const py = spawn('python3', ['./detect_plate.py', imagePath])
+
+            // let result = ''
+            // py.stdout.on('data', data => result += data.toString())
+            // py.stderr.on('data', data => console.error('[PYTHON ERROR]', data.toString()))
+            // py.on('close', () => resolve({ text: result.trim() }))
+        })
+    })
+
 }
