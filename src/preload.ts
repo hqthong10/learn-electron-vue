@@ -30,52 +30,51 @@ export type SaveResult = {
     error?: string;
 };
 
-contextBridge.exposeInMainWorld('platform', os.platform());
-
 const electronApi = {
-    login: (phone: string, password: string) => ipcRenderer.invoke('login', phone, password),
+    version: () => version,
+    platform: () => os.platform(),
 
+    // auth
+    login: (phone: string, password: string) => ipcRenderer.invoke('login', phone, password),
     logout: () => ipcRenderer.invoke('logout'),
 
+    // electron-store
     getInfoUser: () => ipcRenderer.invoke('get-infouser'),
-
     setInfoUser: (params: any) => ipcRenderer.invoke('set-infouser', params),
-
     getSetting: () => ipcRenderer.invoke('get-setting'),
-
     setSetting: (params: any) => ipcRenderer.invoke('set-setting', params),
 
+    // call api request
     getApi: (path: string, data: any, options?: any) => ipcRenderer.invoke('get-api', path, data, options),
-
     postApi: (path: string, data: any, options?: any) => ipcRenderer.invoke('post-api', path, data, options),
-
     getRequest: (path: string, data: any, options?: any) => ipcRenderer.invoke('request-api-get', path, data, options),
-
     postRequest: (path: string, data: any, options?: any) => ipcRenderer.invoke('request-api-post', path, data, options),
 
-    getVersion: () => version,
+    // image
+    saveImage: (imageData: string, filename: string): Promise<SaveResult> => ipcRenderer.invoke('save-image', { imageData, filename }),
 
+    // serialport
+    getComDevices: () => ipcRenderer.invoke('get-com-devices'),
+
+    // node-hid
     getHidDevices: () => ipcRenderer.invoke('get-hid-devices'),
-
     connectHID: (data: any) => ipcRenderer.invoke('connect-hid', data),
-
     onHID: (callback: (data: any) => void) => {
         ipcRenderer.on('hid-data', (_e, data) => callback(data));
     },
 
-    testConnectCamHik: (config: CameraConfig): Promise<ConnectionResult> => ipcRenderer.invoke('test-connect-cam-hik', config),
-
+    // camera hik
+    camHikConnect: (config: CameraConfig): Promise<ConnectionResult> => ipcRenderer.invoke('cam-hik-connect', config),
     camHikCapture: (config: CameraConfig): Promise<CaptureResult> => ipcRenderer.invoke('cam-hik-capture', config),
 
-    saveImage: (imageData: string, filename: string): Promise<SaveResult> => ipcRenderer.invoke('save-image', { imageData, filename }),
-
-    getRtspUrl: (config: CameraConfig): Promise<string> => ipcRenderer.invoke('get-rtsp-url', config),
-
-    connectCameraRtsp: (config: CameraConfig): Promise<string> => ipcRenderer.invoke('connect-cam-rtsp', config),
-
+    // camera rtsp
+    camRtspUrl: (config: CameraConfig): Promise<string> => ipcRenderer.invoke('cam-rtsp-url', config),
+    camRtspConnect: (config: CameraConfig): Promise<string> => ipcRenderer.invoke('cam-rtsp-connect', config),
     camRtspCapture: (rtspUrl: string) => ipcRenderer.invoke('cam-rtsp-capture', rtspUrl),
 
+    // onvif
     getRtspUrlOnvif: (config: any) => ipcRenderer.invoke('get-rtsp-url-onvif', config),
+
 }
 
 contextBridge.exposeInMainWorld('Api', electronApi);

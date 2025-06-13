@@ -67,6 +67,8 @@
     "onvif": "^0.8.0",
     "pinia": "^3.0.2",
     "serialport": "^13.0.0",
+    "sharp": "^0.34.2",
+    "tesseract.js": "^6.0.1",
     "vue-router": "^4.5.1"
   }
 }

@@ -2,17 +2,26 @@ import { defineStore } from 'pinia';
 
 export const useSettingStore = defineStore('setting', {
     state: () => ({
-        camera: [] as ICameraIP[]
+        cameras: [] as ICamera[]
     }),
     actions: {
-        setCame(cam: any) {
-            this.camera = cam;
+        setCameras(cams: ICamera[]) {
+            this.cameras = cams;
         },
-        updateCame(cam: any) {
-            this.camera = cam;
+
+        updateCamera(cam: ICamera) {
+            const camidx = this.cameras.findIndex((item: ICamera) => item.name === cam.name);
+            if (camidx >= 0) {
+                this.cameras[camidx] = { ...this.cameras[camidx], ...cam };
+            }
         },
+
+        addCamera(cam: ICamera) {
+            this.cameras.push(cam);
+        },
+
         removeCamera(name: string) {
-            this.camera = this.camera.filter((m: any) => m.name !== name);
-        },
+            this.cameras = this.cameras.filter((m: any) => m.name !== name);
+        }
     }
 });

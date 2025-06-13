@@ -1,7 +1,7 @@
 <template>
     <div v-bind="attrs" class="parking-view" :class="align">
         <div class="div-left" :class="align">
-            <div class="div-item">
+            <div v-if="hids.length > 0" class="div-item">
                 <el-select
                     v-model="hidDevice"
                     placeholder="Select"
@@ -28,74 +28,104 @@
             <div class="div-item">
                 <el-button @click.native="capture">Chụp</el-button>
             </div>
+            <div class="div-item">
+                <el-button @click.native="selectImage">Chọn file</el-button>
+            </div>
         </div>
         <div class="div-main">
             <div class="display-item"><img v-if="image1.length > 0" :src="image1"></div>
-            <div class="display-item">2</div>
-            <div class="display-item">3</div>
-            <div class="display-item">4</div>
-            <div class="display-item"><ui-camera ref="cameraRef" /></div>
-            <div class="display-item">6</div>
+            <div class="display-item"></div>
+            <div class="display-item"></div>
+            <div class="display-item"></div>
+            <div class="display-item"><ui-camera ref="cameraRef" :config="config1"/></div>
+            <div class="display-item"></div>
         </div>
     </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, computed, useAttrs } from 'vue';
-import UiCamera from '@/components/ui-camera.vue'
+import { ref, reactive, onMounted, onUnmounted, computed, useAttrs } from 'vue';
+import UiCamera from '@/components/ui-camera.vue';
+import { attachChooseFile } from '@/utils/helper';
+import { detectPlateFromImage, processImage } from '@/utils/image-process';
 
 const attrs = useAttrs()
 
 const rifCode = ref('');
 const licensePlate = ref('');
 const image1 = ref('');
-const hids = ref<any[]>([]);
-const hidDevice = ref('');
+const cropPath = ref('');
+const plateText = ref('');
+
+const hids = ref<IDevice[]>([]);
+const coms = ref<IDevice[]>([]);
+const hidDevice = ref(0);
 
 let lastKeyTime = Date.now()
 let buffer = ''
+let keyEventListen: any = null;
+let onHidListen: any = null;
 
 const cameraRef = ref<InstanceType<typeof UiCamera> | null>(null)
+
+const config1 = reactive<ICamera>({
+    name: 'camera 1',
+    type: 'rtsp',
+    ip: '14.241.245.161',
+    port: 554,
+    username: 'viewer',
+    password: 'FB1D2631C12FE8F7EE8951663A8A108',
+    channel: 1
+});
+
 
 const align = computed(() => {
     return attrs.hasOwnProperty('right')  ? '_right' : attrs.hasOwnProperty('top')  ? '_top' : attrs.hasOwnProperty('bottom')  ? '_bottom' : '';
 });
 
 onMounted(async () => {
-    const dv = await window.Api.getHidDevices();
-    console.log(dv);
-    hids.value = dv.filter((d: any) => d.manufacturer.toLowerCase().includes('rfid') && d.interface === 1);
+    hids.value = await window.Api.getHidDevices();
+    coms.value = await window.Api.getComDevices();
+    hidDevice.value = hids.value?.[0]?.productId || 0;
+    onChangeHidDevice();
+});
 
-    window.Api.onHID((data) => {
-        console.log('onHID', data);
-    })
-
-    // window.addEventListener('keydown', (e) => {
-    //     const currentTime = Date.now()
-    //     // Nếu thời gian giữa 2 phím > 100ms, reset buffer (do người gõ tay)
-    //     if (currentTime - lastKeyTime > 100) {
-    //         buffer = ''
-    //     }
-
-    //     if (e.key === 'Enter') {
-    //         // scanner thường kết thúc bằng Enter
-    //         if (buffer.length > 7) {
-    //             console.log('Mã từ thiết bị:', buffer)
-    //             rifCode.value = buffer;
-    //             capture();
-    //         }
-    //         buffer = ''
-    //     } else {
-    //         buffer += e.key
-    //     }
-
-    //     lastKeyTime = currentTime
-    // })
-
+onUnmounted(() => {
+    if(keyEventListen) {
+        window.removeEventListener('keydown', keyEventListen);
+    }
+    keyEventListen = null;
 });
 
 const onChangeHidDevice = () => {
-    const devi = hids.value.find((d: any) => d.productId === hidDevice.value);
-     window.Api.connectHID(JSON.parse(JSON.stringify({...devi})));
+    const devi = hids.value.find((d: IDevice) => d.productId === hidDevice.value);
+    console.log('device selected', devi);
+
+    if(!devi || devi.interface === 0) {
+        keyEventListen = window.addEventListener('keydown', (e) => {
+            const currentTime = Date.now();
+            if (currentTime - lastKeyTime > 100) {
+                buffer = '';
+            }
+            if (e.key === 'Enter') {
+                if (buffer.length > 7) {
+                    console.log('Mã từ thiết bị:', buffer);
+                    rifCode.value = buffer;
+                    capture();
+                }
+                buffer = '';
+            } else {
+                buffer += e.key;
+            }
+            lastKeyTime = currentTime;
+        });
+    }
+
+    if(devi.interface === 1) {
+        window.Api.connectHID(JSON.parse(JSON.stringify({...devi})));
+        onHidListen = window.Api.onHID((data) => {
+            console.log('onHID', data);
+        })
+    }
     
 }
 
@@ -103,6 +133,16 @@ const capture = async () => {
     const rs = await cameraRef.value.capture();
     console.log(rs);
     image1.value = rs;
+}
+
+const selectImage = () => {
+    attachChooseFile('image/*', false, async (files: File[], event: Event) => {
+        // const t = await processImage(files[0]);
+        // console.log('kết qua', t);
+
+        const t = await detectPlateFromImage(files[0]);
+        console.log('kết qua', t);
+    });
 }
 
 </script>

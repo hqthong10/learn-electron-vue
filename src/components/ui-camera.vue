@@ -15,22 +15,17 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, defineExpose } from 'vue';
-import fs from 'fs';
 
-const config = reactive({
-    ip: '14.241.245.161',
-    port: 554,
-    username: 'viewer',
-    password: 'FB1D2631C12FE8F7EE8951663A8A108',
-    channel: 1
-});
+const props = defineProps<{
+    config: ICamera;
+}>();
 
 const isConnected = ref(false);
 const rtspUrl = ref('');
 const videoElement = ref(null);
 
 onMounted(async () => {
-    rtspUrl.value = `rtsp://${config.username}:${config.password}@${config.ip}:${config.port}`
+    rtspUrl.value = `rtsp://${props.config.username}:${props.config.password}@${props.config.ip}:${props.config.port}`
 });
 
 const connectCamera = async () => {

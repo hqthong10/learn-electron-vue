@@ -3,7 +3,8 @@ import fs, { writeFileSync } from 'node:fs';
 import axios from 'axios';
 import store from './store';
 import { SerialPort } from 'serialport';
-import HID from 'node-hid';
+import { ReadlineParser } from '@serialport/parser-readline';
+import { HID, devicesAsync } from 'node-hid';
 import { API_URL, STORE_SETTING_KEY, STORE_USER_KEY } from './constants';
 import callRequest from './api';
 import path from 'node:path';
@@ -78,20 +79,82 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         return null;
     });
 
-    ipcMain.handle('get-hid-devices', async () => {
+    ipcMain.handle('save-image', async (event, { imageData, filename }) => {
         try {
-            return await HID.devicesAsync();
+            const { filePath } = await dialog.showSaveDialog({
+                defaultPath: filename,
+                filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png'] }]
+            });
+
+            if (filePath) {
+                // Remove data URL prefix
+                const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
+                writeFileSync(filePath, base64Data, 'base64');
+                return { success: true, filePath };
+            }
+
+            return { success: false, error: 'Người dùng hủy lưu file' };
+        } catch (error: any) {
+            return { success: false, error: error.message };
+        }
+    });
+
+    ipcMain.handle('get-com-devices', async () => {
+        try {
+            const ports = await SerialPort.list();
+            // console.log('Available serial ports:', ports);
+            return ports.filter(port => 
+                port.manufacturer?.includes('FTDI') || 
+                port.manufacturer?.includes('Silicon Labs') ||
+                port.productId?.includes('USB')
+            );
         } catch (e) {
             console.log(e);
-            return { hid: [], com: [] };
+            return [];
+        }
+    });
+
+    ipcMain.handle('connect-com', async (_, device: any) => {
+        try {
+            const rfidPort = new SerialPort({
+                path: device.path,
+                baudRate: 9600,
+            });
+
+            const rfidParser = rfidPort.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+
+            rfidParser.on('data', async (cardId: string) => {
+                console.log('RFID Card detected:', cardId.trim());
+                mainWindow?.webContents.send('rfid-data', cardId.trim());
+            });
+            
+            rfidPort.on('error', (err) => {
+                console.error('RFID Reader error:', err);
+            });
+
+            return true;
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+    });
+
+    ipcMain.handle('get-hid-devices', async () => {
+        try {
+            const hids = await devicesAsync();
+            // console.log('Available hids:', hids);
+            return hids.filter((d: any) => d.manufacturer.toLowerCase().includes('rfid') && [0, 1].includes(d.interface));
+        } catch (e) {
+            console.log(e);
+            return [];
         }
     });
 
     ipcMain.handle('connect-hid', async (_, device: any) => {
         try {
             console.log(device);
-            const deviceHid = new HID.HID(device.vendorId, device.productId);
-            // let deviceHid = new HID.HID(device.path);
+            const deviceHid = new HID(device.vendorId, device.productId);
+            // let deviceHid = new HID(device.path);
 
             deviceHid.on('data', (data) => {
                 console.log('Received from HID device:', data);
@@ -111,7 +174,7 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         }
     });
 
-    ipcMain.handle('test-connect-cam-hik', async (event, cameraConfig) => {
+    ipcMain.handle('cam-hik-connect', async (event, cameraConfig) => {
         try {
             const { ip, username, password, port } = cameraConfig;
             const auth = Buffer.from(`${username}:${password}`).toString('base64');
@@ -163,27 +226,9 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         }
     });
 
-    ipcMain.handle('save-image', async (event, { imageData, filename }) => {
-        try {
-            const { filePath } = await dialog.showSaveDialog({
-                defaultPath: filename,
-                filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png'] }]
-            });
+    
 
-            if (filePath) {
-                // Remove data URL prefix
-                const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
-                writeFileSync(filePath, base64Data, 'base64');
-                return { success: true, filePath };
-            }
-
-            return { success: false, error: 'Người dùng hủy lưu file' };
-        } catch (error: any) {
-            return { success: false, error: error.message };
-        }
-    });
-
-    ipcMain.handle('get-rtsp-url', async (event, cameraConfig) => {
+    ipcMain.handle('cam-rtsp-url', async (event, cameraConfig) => {
         // rtsplink: 'rtsp://viewer:FB1D2631C12FE8F7@117.3.2.18:554',
         // rtsplink: 'rtsp://viewer:FB1D2631C12FE8F7@14.241.131.216:553',
         // rtsplink: 'rtsp://viewer:FB1D2631C12FE8F7EE8951663A8A108@14.241.245.161:554',
@@ -195,7 +240,7 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
     });
 
     // Handle camera connection and streaming
-    ipcMain.handle('connect-cam-rtsp', async (event, config) => {
+    ipcMain.handle('cam-rtsp-connect', async (event, config) => {
         try {
             const { ip, username, password, port = 554, channel = 1 } = config;
 
@@ -219,7 +264,8 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
             }
 
             const imgPath = await captureFromRTSP(rtspUrl, outputPath);
-            return imgPath; // trả về đường dẫn ảnh
+
+            return imgPath;
         } catch (err) {
             console.error('Chụp ảnh thất bại:', err);
             return null;
@@ -240,6 +286,5 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
             return null;
         }
     });
-
     
 }

@@ -1,4 +1,5 @@
-export interface IDevice {
+/* eslint-disable @typescript-eslint/no-unused-vars */
+interface IDevice {
     path: string;
     manufacturer?: string;
     serialNumber?: string;
