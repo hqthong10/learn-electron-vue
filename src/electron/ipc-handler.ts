@@ -11,6 +11,7 @@ import callRequest from './api';
 import path from 'node:path';
 import { captureFromRTSP } from './camera';
 import { connectToCamera, getRTSPUrl } from './onvif-camera';
+import { getPythonPath } from './utils';
 
 let mainWindow: BrowserWindow;
 
@@ -266,14 +267,14 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
 
             const imgPath = await captureFromRTSP(rtspUrl, outputPath);
 
-            return imgPath;
+            return { imgPath };
         } catch (err) {
             console.error('Chụp ảnh thất bại:', err);
             return null;
         }
     });
 
-    ipcMain.handle('get-rtsp-url-onvif', async (_, config: any) => {
+    ipcMain.handle('cam-onvif-url', async (_, config: any) => {
         try {
             console.log('gogogo');
             const { ip, username, password } = config;
@@ -288,16 +289,17 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         }
     });
 
-    ipcMain.handle('process-image', async (event, imagePath) => {
-        const { PythonShell } = require('python-shell');
+    ipcMain.handle('detect-image', async (event, image) => {
+        return new Promise((resolve) => {
+            const py = spawn(getPythonPath(), ['src/electron/pythons/easyocr_runner.py']);
 
-        return new Promise((resolve, reject) => {
-            // const py = spawn('python3', ['./detect_plate.py', imagePath])
+            let result = '';
+            py.stdout.on('data', data => result += data.toString());
+            py.stderr.on('data', data => console.error('[PYTHON ERROR]', data.toString()));
+            py.on('close', () => resolve(result.trim()));
 
-            // let result = ''
-            // py.stdout.on('data', data => result += data.toString())
-            // py.stderr.on('data', data => console.error('[PYTHON ERROR]', data.toString()))
-            // py.on('close', () => resolve({ text: result.trim() }))
+            py.stdin.write(JSON.stringify({ image: image }))
+            py.stdin.end()
         })
     })
 

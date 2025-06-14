@@ -73,10 +73,10 @@ const electronApi = {
     camRtspCapture: (rtspUrl: string) => ipcRenderer.invoke('cam-rtsp-capture', rtspUrl),
 
     // onvif
-    getRtspUrlOnvif: (config: any) => ipcRenderer.invoke('get-rtsp-url-onvif', config),
+    camOnvifUrl: (config: any) => ipcRenderer.invoke('cam-onvif-url', config),
 
     //
-    processImage: (imagePath: string) => ipcRenderer.invoke('process-image', imagePath),
+    detectImage: (img: any) => ipcRenderer.invoke('detect-image', img),
 
 }
 

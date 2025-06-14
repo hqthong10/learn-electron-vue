@@ -18,3 +18,12 @@ export function attachChooseFile(accept: string, isMulti = false, callback: (fil
 
     return inputFileChange;
 }
+
+export function fileToBase64(file: File | Blob) {
+    return new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result);
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+    });
+}

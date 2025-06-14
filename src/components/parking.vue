@@ -26,16 +26,16 @@
                 <span>{{ licensePlate }}</span>
             </div>
             <div class="div-item">
-                <el-button @click.native="capture">Chụp</el-button>
+                <el-button :disabled="loadingCapture" @loading="loadingCapture" @click.native="capture">Chụp</el-button>
             </div>
             <div class="div-item">
                 <el-button @click.native="selectImage">Chọn file</el-button>
             </div>
         </div>
         <div class="div-main">
-            <div class="display-item"><img v-if="image1.length > 0" :src="image1"></div>
+            <div class="display-item"><img v-if="imgCapture1.length > 0" :src="imgCapture1"></div>
             <div class="display-item"></div>
-            <div class="display-item"></div>
+            <div class="display-item"><img v-if="imgDetect.length > 0" :src="imgDetect"></div>
             <div class="display-item"></div>
             <div class="display-item"><ui-camera ref="cameraRef" :config="config1"/></div>
             <div class="display-item"></div>
@@ -45,16 +45,18 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, computed, useAttrs } from 'vue';
 import UiCamera from '@/components/ui-camera.vue';
-import { attachChooseFile } from '@/utils/helper';
-import { detectPlateFromImage, processImage } from '@/utils/image-process';
+import { attachChooseFile, fileToBase64 } from '@/utils/helper';
 
 const attrs = useAttrs()
 
 const rifCode = ref('');
 const licensePlate = ref('');
-const image1 = ref('');
+const imgCapture1 = ref('');
+const imgDetect = ref('');
 const cropPath = ref('');
 const plateText = ref('');
+
+const loadingCapture = ref(false);
 
 const hids = ref<IDevice[]>([]);
 const coms = ref<IDevice[]>([]);
@@ -76,7 +78,6 @@ const config1 = reactive<ICamera>({
     password: 'FB1D2631C12FE8F7EE8951663A8A108',
     channel: 1
 });
-
 
 const align = computed(() => {
     return attrs.hasOwnProperty('right')  ? '_right' : attrs.hasOwnProperty('top')  ? '_top' : attrs.hasOwnProperty('bottom')  ? '_bottom' : '';
@@ -130,31 +131,27 @@ const onChangeHidDevice = () => {
 }
 
 const capture = async () => {
+    loadingCapture.value = true;
     const rs = await cameraRef.value.capture();
+    loadingCapture.value = false;
     console.log(rs);
-    image1.value = rs;
+    imgCapture1.value = rs.imgPath || '';
 }
+
+
 
 const selectImage = () => {
     attachChooseFile('image/*', false, async (files: File[], event: Event) => {
         const file = files[0]
         if (!file) return;
-
-        const t = await detectPlateFromImage(file);
-        // const t2 = await window.Api.processImage(file.path)
-
-        console.log('kết qua 1', t);
-        // console.log('kết qua 2', t2);
-
-        // Gửi file ảnh lên main process
-        const reader = new FileReader();
-
-        reader.onload = async () => {
-            // const t = await processImage(reader.result);
-            // console.log('kết qua', t);
-        };
-
-        reader.readAsArrayBuffer(file);
+        loadingCapture.value = true;
+        // imgDetect.value = URL.createObjectURL(file);
+        
+        const base64 = await fileToBase64(file);
+        const t2 = await window.Api.detectImage(base64);
+        console.log('kết qua t', JSON.parse(t2));
+        licensePlate.value = JSON.parse(t2).results.join(' ');
+        loadingCapture.value = false;
     });
 }
 

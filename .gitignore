@@ -1,5 +1,9 @@
 .DS_Store
 .vite/build/*
 node_modules/
+pythonenv/
+build/
+dist/
+*.spec
 components.d.ts
 auto-imports.d.ts

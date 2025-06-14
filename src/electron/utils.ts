@@ -1,6 +1,7 @@
 import { app } from 'electron';
 import path from 'node:path';
 import * as fs from 'node:fs';
+import os from 'os';
 
 export function getSavePath(fileName: string) {
     const platformSaveDir = app.getPath('videos'); // có thể là 'documents', 'desktop', etc.
@@ -16,12 +17,25 @@ export function getSavePath(fileName: string) {
 }
 
 export function getFfmpegPath() {
-  if (app.isPackaged) {
-    // In packaged app
-    return path.join(process.resourcesPath, 'ffmpeg-static', 'ffmpeg');
-  } else {
-    // In development
-    return require('ffmpeg-static');
-  }
+    if (app.isPackaged) {
+        // In packaged app
+        return path.join(process.resourcesPath, 'ffmpeg-static', 'ffmpeg');
+    } else {
+        // In development
+        return require('ffmpeg-static');
+    }
 }
 
+export function getPythonPath() {
+    if (app.isPackaged) {
+        // In packaged app
+        console.log('packaged', 'pythonPath', path.join(process.resourcesPath, 'dist', 'app'));
+        return path.join(process.resourcesPath, 'dist', 'app');
+    } else {
+        // In development
+        const isWin = os.platform() === 'win32';
+        const venvPath = path.join(__dirname, '../..', 'pythonenv');
+        const pythonExecutable = isWin ? path.join(venvPath, 'Scripts', 'python3.exe') : path.join(venvPath, 'bin', 'python3');
+        return pythonExecutable;
+    }
+}

@@ -14,7 +14,7 @@
                 </el-form-item>
             </el-form>
                    
-            <div><a @click="actionSkip">Bỏ qua</a></div>
+            <div><a style="cursor: pointer;" @click="actionSkip">Bỏ qua</a></div>
         </div>
     </div>
 </template>

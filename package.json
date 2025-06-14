@@ -1,6 +1,6 @@
 {
-  "name": "parking-anager",
-  "productName": "parking-anager",
+  "name": "parking-manager",
+  "productName": "parking-manager",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",
@@ -66,10 +66,8 @@
     "node-rtsp-stream": "^0.0.9",
     "onvif": "^0.8.0",
     "pinia": "^3.0.2",
-    "python-shell": "^5.0.0",
     "serialport": "^13.0.0",
     "sharp": "^0.34.2",
-    "tesseract.js": "^6.0.1",
     "vue-router": "^4.5.1"
   }
 }

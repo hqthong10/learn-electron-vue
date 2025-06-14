@@ -51,7 +51,7 @@ export default defineConfig({
     // Server configuration (dev only)
     server: {
         host: 'localhost',
-        port: 3000,
+        port: 3050,
         strictPort: true
     },
 

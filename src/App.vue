@@ -1,6 +1,6 @@
 <template>
     <div class="main-layout">
-        <sidebar></sidebar>
+        <sidebar v-if="!isLoginPage"></sidebar>
         <RouterView class="main-body"></RouterView>
         <ui-overlay-loading />
     </div>
@@ -16,6 +16,8 @@ const router = useRouter();
 const authStore = useAuthStore();
 
 const isLogin = computed(() => authStore?.token?.length > 0);
+
+const isLoginPage = computed(() => router.currentRoute.value.path.includes('/login'));
 
 onBeforeMount(async () => {
     // await authStore.loadFromElectron();
