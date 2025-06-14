@@ -1,6 +1,6 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import fs, { writeFileSync } from 'node:fs';
-import { spawn } from 'child_process';
+import { spawn, execFile } from 'child_process';
 import axios from 'axios';
 import store from './store';
 import { SerialPort } from 'serialport';
@@ -105,11 +105,7 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         try {
             const ports = await SerialPort.list();
             // console.log('Available serial ports:', ports);
-            return ports.filter(port =>
-                port.manufacturer?.includes('FTDI') ||
-                port.manufacturer?.includes('Silicon Labs') ||
-                port.productId?.includes('USB')
-            );
+            return ports.filter((port) => port.manufacturer?.includes('FTDI') || port.manufacturer?.includes('Silicon Labs') || port.productId?.includes('USB'));
         } catch (e) {
             console.log(e);
             return [];
@@ -120,7 +116,7 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         try {
             const rfidPort = new SerialPort({
                 path: device.path,
-                baudRate: 9600,
+                baudRate: 9600
             });
 
             const rfidParser = rfidPort.pipe(new ReadlineParser({ delimiter: '\r\n' }));
@@ -168,8 +164,6 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
                 deviceHid.close();
             });
             return true;
-
-
         } catch (err) {
             console.error('Error connecting to HID device:', err);
             return false;
@@ -227,8 +221,6 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
             };
         }
     });
-
-
 
     ipcMain.handle('cam-rtsp-url', async (event, cameraConfig) => {
         // rtsplink: 'rtsp://viewer:FB1D2631C12FE8F7@117.3.2.18:554',
@@ -289,18 +281,55 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
         }
     });
 
-    ipcMain.handle('detect-image', async (event, image) => {
+    ipcMain.handle('detect-image', async (event, obj) => {
         return new Promise((resolve) => {
-            const py = spawn(getPythonPath(), ['src/electron/pythons/easyocr_runner.py']);
+            // const py = spawn(getPythonPath(), ['src/electron/pythons/easyocr_runner.py']);
+            // let result = '';
+            // py.stdout.on('data', data => result += data.toString());
+            // py.stderr.on('data', data => console.error('[PYTHON ERROR]', data.toString()));
+            // py.on('close', () => resolve(result.trim()));
+
+            // py.stdin.write(JSON.stringify({ image: obj.base64 }))
+            // py.stdin.end()
+
+            // use imagePath
+            // execFile(getPythonPath(), ['src/electron/pythons/detect_and_crop_plate.py', obj.imgPath], (error: any, stdout: any, stderr: any) => {
+            //     if (error) return resolve(null);
+            //     try {
+            //         const result = JSON.parse(stdout);
+            //         resolve(result);
+            //     } catch (e) {
+            //         console.log('error', stdout)
+            //         resolve(null);
+            //     }
+            // });
+
+            // use image base64
+            const py = spawn(getPythonPath(), ['src/electron/pythons/detect_and_crop_plate.py']);
+            // const py = spawn(getPythonPath(), ['src/electron/pythons/easyocr_runner.py']);
 
             let result = '';
-            py.stdout.on('data', data => result += data.toString());
-            py.stderr.on('data', data => console.error('[PYTHON ERROR]', data.toString()));
+            let error = '';
+
+            py.stdout.on('data', (data) => (result += data.toString()));
+            py.stderr.on('data', (data) => (error += data.toString()));
+            // py.on('close', (code) => {
+            //     if (code !== 0 || error) {
+            //         console.log(error, code);
+            //         return resolve(null);
+            //     }
+            //     try {
+            //         resolve(JSON.parse(result));
+            //     } catch (e) {
+            //         console.log(result);
+            //         resolve(result)
+            //     }
+            // });
             py.on('close', () => resolve(result.trim()));
 
-            py.stdin.write(JSON.stringify({ image: image }))
-            py.stdin.end()
-        })
-    })
-
+            // Gửi base64 qua stdin
+            py.stdin.write(JSON.stringify({ image: obj.base64 }));
+            py.stdin.end();
+        });
+    });
 }

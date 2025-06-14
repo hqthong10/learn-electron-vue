@@ -147,9 +147,10 @@ const selectImage = () => {
         loadingCapture.value = true;
         // imgDetect.value = URL.createObjectURL(file);
         
+        const imgPath = URL.createObjectURL(file);
         const base64 = await fileToBase64(file);
-        const t2 = await window.Api.detectImage(base64);
-        console.log('kết qua t', JSON.parse(t2));
+        const t2 = await window.Api.detectImage({file, base64, imgPath});
+        console.log('kết qua t', t2);
         licensePlate.value = JSON.parse(t2).results.join(' ');
         loadingCapture.value = false;
     });
