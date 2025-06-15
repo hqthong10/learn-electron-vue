@@ -29,13 +29,24 @@ export function getFfmpegPath() {
 export function getPythonPath() {
     if (app.isPackaged) {
         // In packaged app
-        console.log('packaged', 'pythonPath', path.join(process.resourcesPath, 'dist', 'app'));
         return path.join(process.resourcesPath, 'dist', 'app');
     } else {
         // In development
         const isWin = os.platform() === 'win32';
         const venvPath = path.join(__dirname, '../..', 'pythonenv');
-        const pythonExecutable = isWin ? path.join(venvPath, 'Scripts', 'python3.exe') : path.join(venvPath, 'bin', 'python3');
+        const pythonExecutable = isWin ? path.join(venvPath, 'Scripts', 'python.exe') : path.join(venvPath, 'bin', 'python3');
         return pythonExecutable;
+    }
+}
+
+export function getPythonFile(name: string) {
+    if (app.isPackaged) {   
+        if (os.platform() === 'win32') {
+            return path.join(process.resourcesPath, `${name}.exe`);
+        } else {
+            return path.join(process.resourcesPath, `${name}`);
+        }
+    } else {
+        return `pythons/${name}.py`;
     }
 }

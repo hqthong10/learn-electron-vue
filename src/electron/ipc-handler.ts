@@ -11,7 +11,7 @@ import callRequest from './api';
 import path from 'node:path';
 import { captureFromRTSP } from './camera';
 import { connectToCamera, getRTSPUrl } from './onvif-camera';
-import { getPythonPath } from './utils';
+import { getPythonFile, getPythonPath } from './utils';
 
 let mainWindow: BrowserWindow;
 
@@ -283,49 +283,19 @@ export function setupIpcHandlers(_mainWindow: BrowserWindow) {
 
     ipcMain.handle('detect-image', async (event, obj) => {
         return new Promise((resolve) => {
-            // const py = spawn(getPythonPath(), ['src/electron/pythons/easyocr_runner.py']);
-            // let result = '';
-            // py.stdout.on('data', data => result += data.toString());
-            // py.stderr.on('data', data => console.error('[PYTHON ERROR]', data.toString()));
-            // py.on('close', () => resolve(result.trim()));
-
-            // py.stdin.write(JSON.stringify({ image: obj.base64 }))
-            // py.stdin.end()
-
-            // use imagePath
-            // execFile(getPythonPath(), ['src/electron/pythons/detect_and_crop_plate.py', obj.imgPath], (error: any, stdout: any, stderr: any) => {
-            //     if (error) return resolve(null);
-            //     try {
-            //         const result = JSON.parse(stdout);
-            //         resolve(result);
-            //     } catch (e) {
-            //         console.log('error', stdout)
-            //         resolve(null);
-            //     }
-            // });
-
-            // use image base64
-            const py = spawn(getPythonPath(), ['src/electron/pythons/detect_and_crop_plate.py']);
-            // const py = spawn(getPythonPath(), ['src/electron/pythons/easyocr_runner.py']);
+            // const py = spawn(getPythonPath(), [getPythonFile('detect_and_crop_plate')]);
+            const py = spawn(getPythonPath(), [getPythonFile('plate')]);
 
             let result = '';
-            let error = '';
-
             py.stdout.on('data', (data) => (result += data.toString()));
-            py.stderr.on('data', (data) => (error += data.toString()));
-            // py.on('close', (code) => {
-            //     if (code !== 0 || error) {
-            //         console.log(error, code);
-            //         return resolve(null);
-            //     }
-            //     try {
-            //         resolve(JSON.parse(result));
-            //     } catch (e) {
-            //         console.log(result);
-            //         resolve(result)
-            //     }
-            // });
-            py.on('close', () => resolve(result.trim()));
+            py.stderr.on('data', (data) => (console.log('error', data.toString())));
+            py.on('close', () => {
+                try {
+                    resolve(JSON.parse(result.trim()));
+                } catch (error) {
+                    resolve(result.trim());
+                }
+            });
 
             // Gửi base64 qua stdin
             py.stdin.write(JSON.stringify({ image: obj.base64 }));

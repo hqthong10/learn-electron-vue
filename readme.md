@@ -8,16 +8,20 @@
 python3 -m venv pythonenv
 
 - Kích hoạt virtual environment
-source pythonenv/bin/activate
+mac: source pythonenv/bin/activate
+win: pythonenv\Scripts\activate
 
 - upgrade pip
 pip install --upgrade pip
 
 - cài thư viện
-pip install easyocr pyinstaller
+pip install easyocr pyinstaller opencv-python numpy torch torchvision Pillow
 
 - thoát virtual environment
 deactivate
+
+- 
+pyinstaller --onefile src/electron/pythons/detect_and_crop_plate.py
 
 # Tạo executable cho tất cả file .py
 pyinstaller --onefile --windowed src/python-utils/detect_plate.py

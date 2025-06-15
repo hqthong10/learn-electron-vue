@@ -13,6 +13,10 @@ const config: ForgeConfig = {
     name: 'My Electron App',
     icon: path.resolve(__dirname, 'assets/app/icon'),
     asar: true,
+    extraResource: [
+      './dist/detect_and_crop_plate.exe',
+      './dist/detect_and_crop_plate'
+    ]
   },
   rebuildConfig: {
     force: true

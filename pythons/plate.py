@@ -4,7 +4,10 @@ import numpy as np
 import base64
 import json
 import sys
-import io
+import re
+
+# Regex định dạng biển số xe Việt Nam
+PLATE_REGEX =  re.compile(r'\d{2}[A-Z]{1,2}[- ]?\d{3,5}(\.\d{2})?')
 
 def read_base64_image(base64_string):
     try:
@@ -12,32 +15,36 @@ def read_base64_image(base64_string):
         nparr = np.frombuffer(img_data, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         return img
-    except Exception as e:
+    except Exception:
         return None
-    
-def detect_and_crop_to_json(base64_string):
-    # image = cv2.imread(image_path)
-    # if image is None:
-    #     print(json.dumps({"error": f"Không đọc được ảnh: {image_path}"}))
-    #     return
 
+def is_valid_vn_plate(text):
+    return bool(PLATE_REGEX.search(text.replace(" ", "").upper()))
+
+def detect_and_crop_to_json(base64_string):
     image = read_base64_image(base64_string)
     if image is None:
         print(json.dumps({"error": "Không thể giải mã ảnh từ base64"}))
         return
-    
-    reader = easyocr.Reader(['en'])
-    results = reader.readtext(image)
-    
-    # text_results = [res[1] for res in results]
-    # print(json.dumps({"results": text_results}))
 
+    try:
+        reader = easyocr.Reader(['vi', 'en'])
+    except Exception as e:
+        print(json.dumps({"error": f"Model loading failed: {str(e)}"}))
+        sys.exit(1)
+
+    results = reader.readtext(image)
     output = []
 
     h, w = image.shape[:2]
 
     for bbox, text, confidence in results:
+        print(f"OCR result: '{text}' with confidence {confidence}")
         if confidence < 0.4:
+            continue
+
+        text_clean = text.replace(" ", "").upper()
+        if not is_valid_vn_plate(text_clean):
             continue
 
         pts = np.array(bbox).astype(int)
@@ -47,19 +54,20 @@ def detect_and_crop_to_json(base64_string):
         y_max = min(h, max(pts[:, 1]))
 
         cropped = image[y_min:y_max, x_min:x_max]
-
-        # Encode cropped image to base64
         _, buffer = cv2.imencode('.jpg', cropped)
         img_base64 = base64.b64encode(buffer).decode('utf-8')
 
         output.append({
-            "text": text,
-            "confidence": round(confidence, 2),
-            "bounding_box": bbox,
+            "text": text_clean,
+            "confidence": round(float(confidence), 2),
+            "bounding_box": [[int(x), int(y)] for x, y in bbox],
             "image_base64": img_base64
         })
 
-    print(json.dumps(output, ensure_ascii=False))
+    if not output:
+        print(json.dumps({"error": "Không phát hiện biển số hợp lệ"}))
+    else:
+        print(json.dumps(output, ensure_ascii=False))
 
 def main():
     input_data = sys.stdin.read()
