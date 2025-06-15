@@ -150,7 +150,7 @@ const selectImage = () => {
         const imgPath = URL.createObjectURL(file);
         const base64 = await fileToBase64(file);
         const t2 = await window.Api.detectImage({file, base64, imgPath});
-        console.log('kết qua t', t2);
+        console.log('kết quả =', t2);
         // licensePlate.value = t2.results.join(' ');
         loadingCapture.value = false;
     });

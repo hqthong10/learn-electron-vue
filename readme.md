@@ -15,13 +15,14 @@ win: pythonenv\Scripts\activate
 pip install --upgrade pip
 
 - cài thư viện
-pip install easyocr pyinstaller opencv-python numpy torch torchvision Pillow
+pip install easyocr pyinstaller opencv-python-headless numpy
 
 - thoát virtual environment
 deactivate
 
 - 
 pyinstaller --onefile src/electron/pythons/detect_and_crop_plate.py
+pyinstaller --onefile pythons/plate.py
 
 # Tạo executable cho tất cả file .py
 pyinstaller --onefile --windowed src/python-utils/detect_plate.py

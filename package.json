@@ -5,6 +5,8 @@
   "description": "My Electron application description",
   "main": ".vite/build/main.js",
   "scripts": {
+    "init:win:python": "cmd /c scripts\\init-python.bat",
+    "init:mac:python": "bash scripts/init-python.sh",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
