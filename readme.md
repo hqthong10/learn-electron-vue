@@ -1,7 +1,11 @@
 ## start
-- node: 22
-- npm i
-- npm start
+- B1: use node 22
+- B2: npm i
+- B3: khởi tạo môi trường python
+    npm run init:mac:python or npm run init:win:python
+- B4: download trước thư viện cho python
+    python3 pythons/test.py
+- B5: npm start
 
 # python3
 - Tạo virtual environment
@@ -20,28 +24,21 @@ pip install easyocr pyinstaller opencv-python-headless numpy
 - thoát virtual environment
 deactivate
 
-- 
-pyinstaller --onefile src/electron/pythons/detect_and_crop_plate.py
+- tạo executable cho python
 pyinstaller --onefile pythons/plate.py
+<!-- find . -name "*.py" -maxdepth 1 -exec sh -c 'pyinstaller --onefile --name "$(basename "{}" .py)" "{}"' \; -->
 
-# Tạo executable cho tất cả file .py
-pyinstaller --onefile --windowed src/python-utils/detect_plate.py
-find . -name "*.py" -maxdepth 1 -exec sh -c 'pyinstaller --onefile --name "$(basename "{}" .py)" "{}"' \;
-
-#
-Nhận diện biển số	OpenALPR, Plate Recognizer, hoặc AI nội bộ
-
-
-2. USB (USB HID hoặc USB generic)
-- Dùng node-hid nếu là USB HID (như barcode scanner).
-- Dùng usb nếu là thiết bị USB không theo chuẩn HID.
 
 ## path electron app
 app.getPath('userData'): File ảnh dùng trong app
 app.getPath('pictures'): Người dùng cần dễ tìm
 app.getPath('temp'): Tệp tạm / test	
 
-# device
+# USB (USB HID hoặc USB generic)
+- Dùng node-hid nếu là USB HID (như barcode scanner).
+- Dùng usb nếu là thiết bị USB không theo chuẩn HID.
+
+# device use
 - camera hkvision DS-2CD1121G2-LIU
 - usb reader
 
